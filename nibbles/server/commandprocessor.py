@@ -1,9 +1,8 @@
 import logging
 from nibbles.server.serverexceptions import *
-from nibbles.server.engine import *
+from nibbles.server.engine import INIT
 
 class CommandProcessor():
-
     def __init__(self):
         """Initialize the commandProcessor."""
 
