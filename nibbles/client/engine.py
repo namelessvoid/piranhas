@@ -13,44 +13,44 @@ class Engine(threading.Thread):
         self._board = board
         self._ai = ai
 
-    def recieveCommand(self):
+    def recievecommand(self):
         """Recieves a message from networkinterface and return it"""
         command = self._ni.recieveMessage()
         return command
 
-    def registrationPossible(self):
+    def registrationpossible(self):
         """Checks whether registration is possible on server"""
         self._ni.sendMessage("anmeldung moeglich@")
 
-    def connectToServer(self):
+    def connecttoserver(self):
         """Connects to the Server"""
         self._ni.sendMessage("anmelden@")
 
-    def getWorldSize(self):
+    def getworldsize(self):
         """Gets the size of the world"""
         self._ni.sendMessage("weltgroesse@")
 
-    def startGame(self):
+    def startgame(self):
         """Starts the game"""
         self._ni.sendMessage("spielbeginn@")
 
-    def moveToken(self, x, y, newX, newY):
+    def movetoken(self, x, y, newX, newY):
         """Moves a token on the board"""
         self._board.moveToken(x, y, newX, newY)
 
-    def setToken(self, token, x, y):
+    def settoken(self, token, x, y):
         """Sets a token on the board"""
         self._board.setToken(token, x, y)
 
-    def getToken(self, x, y):
+    def gettoken(self, x, y):
         """Gets the token on the spezified position of the board"""
         self._board.getToken(x,y)
 
-    def printMessage(self, message):
+    def printmessage(self, message):
         """prints a message to stdout"""
         sys.stdout.write(message)
 
-    def paintBoard(self):
+    def paintboard(self):
         """Renders the board"""
         self._board.paintBoard()
 
@@ -61,11 +61,11 @@ class Engine(threading.Thread):
            - ... : (<function_name>,"") => calls the function with message from server as parameter
            - ... : (<function_name>,param) => calls the function with parameter param"""
         functions = {
-            "ja@" : self.connectToServer,
-            "nein@" : (self.printMessage,"Anmeldung nicht moeglich"),
-            "\D{1}@" : self.startGame,
-            "\d+x\d+@" : (self.printMessage,""),
-            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}@" : (self.printMessage,"")
+            "ja@" : self.connecttoserver,
+            "nein@" : (self.printmessage,"Anmeldung nicht moeglich"),
+            "\D{1}@" : self.startgame,
+            "\d+x\d+@" : (self.printmessage,""),
+            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}@" : (self.printmessage,"")
         }
         #while 1:
         #command = self.recieveCommand()
@@ -94,7 +94,7 @@ class Engine(threading.Thread):
                     functions[key]()
                     break
             elif i == len(functions)-1:
-                self.printMessage("fehler@")
+                self.printmessage("fehler@")
                 break
 
 if __name__== "__main__":
@@ -104,5 +104,5 @@ if __name__== "__main__":
     #ai = AI()
 
     engine = Engine()
-    #engine.paintBoard()
+    #engine.paintboard()
     engine.run()

@@ -22,6 +22,9 @@ class Server():
         except thread.error:
             logging.warning('Unable to start listenThreadServer')
 
+        while True:
+            pass
+
 
     def listen(self, HOST='', PORT=1234, threadDelay=1):
         """Listens to the socket.
@@ -37,8 +40,11 @@ class Server():
         print "adas"
 
         self.s = socket.socket()
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((self.HOST, self.PORT))
         self.s.listen(1)
+
+        print "lksdf"
 
         while True:
             self.clientNumber += 1
@@ -47,7 +53,7 @@ class Server():
             self.clientList.insert(self.clientNumber ,ClientHandler(self.commandProcessor, c, self.clientNumber, self.threadDelay))
 
     def sendTo(self, currentClientNumber=0, message=''):
-        """Sends message to the specific client.
+        """Sends messages to the specific client.
                 Arguments:
                     currentClientNumber -- (integer)
                     message -- (string) """

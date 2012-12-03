@@ -1,4 +1,6 @@
 import logging
+from nibbles.server.serverexceptions import *
+from nibbles.server.engine import *
 
 class CommandProcessor():
 
@@ -27,8 +29,12 @@ class CommandProcessor():
                     data --  (integer) defined in seconds.
                     clientNumber --  (string) defined in seconds."""
 
+        data = data.strip()
+        print data
+
+
         if data == 'anmeldung moeglich@':
-            if self.engine.getgamestatus() == self.engine.INIT:
+            if self.engine.getgamestatus() == INIT:
                     self.server.sendTo(clientNumber, 'ja@')
             else:
                     self.server.sendTo(clientNumber, 'nein@')
@@ -38,16 +44,17 @@ class CommandProcessor():
             else:
                 nibblechar = None
                 try:
-                    nibblechar = self.engine.registernibble()
+                    nibblechar = self.engine.register()
                     self.nibbleclientdict[nibblechar] = clientNumber
-                except:
+                except RegisterNibbleFailedException, m:
+                    logging.warning(m)
                     logging.warning('Anmeldung von %d mit Buchstabe %s nicht moeglich!' %(clientNumber,nibblechar))
                 if nibblechar != None:
                     self.server.sendTo(clientNumber, '%s@' %nibblechar)
 
         elif clientNumber in self.nibbleclientdict:
             if data == 'weltgroesse@':
-                if self.engine.getgamestatus() == self.engine.INIT:
+                if self.engine.getgamestatus() == INIT:
                     self.server.sendTo(clientNumber, 'fehler@')
                 else:
                     x, y = self.engine.getworlddimentions()
