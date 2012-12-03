@@ -11,7 +11,7 @@ random = random.Random()
 engine = Engine(random)
 commandprocessor.setengine(engine)
 engine.setcmp(commandprocessor)
-
+#hallo
 
 while True:
     pass
