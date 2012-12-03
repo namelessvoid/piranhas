@@ -2,7 +2,7 @@ from nibbles.server.network.clientHandler import ClientHandler
 from nibbles.nibblelogger import NibbleStreamLogger
 
 import socket
-import thread
+import threading
 import logging
 
 
@@ -22,11 +22,15 @@ class Server():
         self.clientList = []
 
         try:
-            self.listenThreadServer = thread.start_new_thread(self.listen, (HOST, PORT, threadDelay))
+            self.listenThreadServer = threading.Thread(target=self.listen, args=(HOST, PORT, threadDelay))
+            self.listenThreadServer.start()
+            print self.listenThreadServer
             self._logger.info('Serverthread started!')
-        except thread.error:
+        except:
             self._logger.warning('Unable to start listenThreadServer')
 
+    def setjoin(self):
+        self.listenThreadServer.join()
 
     def listen(self, HOST='', PORT=1234, threadDelay=1):
         """Listens to the socket.
