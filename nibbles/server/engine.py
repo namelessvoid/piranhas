@@ -1,8 +1,9 @@
 # import circular list here. -.-
-import logging
 import string
 import threading
 import datetime
+import logging
+from nibbles.nibblelogger import NibbleStreamLogger
 from nibbles.circularlist import *
 from nibbles.nibble import *
 from nibbles.board import *
@@ -25,13 +26,8 @@ class Engine():
                 random -- object which proviedes a randint method that
                 clones bahaviour of random.randint(...)"""
         # create logger
-        self._logger = logging.getLogger("server.engine")
+        self._logger = NibbleStreamLogger("server.engine")
         self._logger.setLevel(logging.WARNING)
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s" +
-                    "- %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self._logger.addHandler(ch)
 
         # Initializes the engine.
         self._nibblelist = CircularList()
@@ -93,7 +89,7 @@ class Engine():
             raise e
         else:
             nibble._energy = 0
-            self._board.settoken(".", nibble.x, nibble.y)
+            self._board.settoken(".", nibble._xpos, nibble._ypos)
             # if the current nibble was killed advance with next nibble
             if self._nibblelist.current() == nibble:
                 self._currentnibbleid = self._nibblelist.next().getName()
@@ -129,7 +125,7 @@ class Engine():
     def getgamestatus(self):
         """Get the status of the game.
             Return: INIT, RUNNING or ENDED"""
-        return self.status
+        return self._status
 
     def setfoodpernibble(self, number):
         """Sets the amount of food to be dropped per nibble each round.
@@ -190,7 +186,7 @@ class Engine():
         for n in self._nibblelist:
             x = self._random.randint(0, self._board.getwidth)
             y = self._random.randint(0, self._board.getheight)
-            self._board.setToken(n, x, y)
+            self._board.settoken(n, x, y)
             n.setPos(x, y)
 
         # Set first player
@@ -198,7 +194,7 @@ class Engine():
         # Set status to running
         self._status = RUNNING
         self._logger.info("Game started (gamestart: %s)" % self._gamestart)
-        self._timer.start(self._turntimeout, self.execturn,
+        self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
         # send board information to first nibble
         self._sendtocmp()
@@ -220,7 +216,7 @@ class Engine():
         if not nibbleid == self._currentnibbleid:
             return -1
 
-        nibble = self.getnibblebyid()(self._currentnibbleid)
+        nibble = self.getnibblebyid(self._currentnibbleid)
 
         # 0.) Interrupt timer
         self._timer.cancel()
@@ -237,12 +233,13 @@ class Engine():
 
         # 3.) combat / food consumption
         token = self._board.gettoken(newx, newy)
-        # food found?
-        if token == "*":
-            nibble.setEnergy(nibble.getEnergy() + self._energyperfood)
+        self._logger.warning(token)
         # enemy found?
-        elif token in self._nibblelist:
+        if token in self._nibblelist:
             self._fight(nibble, token)
+        # food found?
+        elif token == "*":
+            nibble.setEnergy(nibble.getEnergy() + self._energyperfood)
 
         # 4.) move
         # nibble not killed by enemy?
@@ -251,7 +248,7 @@ class Engine():
             nibble.setPos(newx, newy)
         # if nibble was killed, remove it from the board
         else:
-            self._board.setToken(oldx, oldy, '.')
+            self._board.settoken('.', oldx, oldy)
 
         # 5.) game end?
         if self._currentround == self._rounds or len(self._nibblelist) <= 1:
@@ -335,7 +332,7 @@ class Engine():
                 break
 
         self._currentnibbleid = nibble.getName()
-        self._timer.start(self._turntimeout, self.execturn,
+        self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
         self._sendtocmp()
 
@@ -349,6 +346,5 @@ class Engine():
             the part of the board that's visible to the nibble
             and its energy."""
         nibble = self.getnibblebyid(self._currentnibbleid)
-        self._board.getnibbleview(nibble.getPos())
-        boardview = self._board.getnibbleview(nibble.getPos())
+        boardview = self._board.getnibbleview(nibble._xpos, nibble._ypos)
         self._cmp.send(self._currentnibbleid, boardview, nibble.getEnergy())

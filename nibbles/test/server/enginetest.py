@@ -11,14 +11,14 @@ class CMPDummy():
         self.text = None
 
     def send(self, nibbleid, board, energy, end=False):
-        self.text("%c;%c;%c;%c" % (nibbleid, board, energy, end))
+        self.text = "%s;%s;%s;%s" % (nibbleid, board, energy, end)
 
 
 class RandomDummy():
     def __init__(self):
         pass
 
-    def randint(start, end):
+    def randint(self, start, end):
         return 0
 
 
@@ -27,6 +27,7 @@ class TestEngine(unittest.TestCase):
         self.cmp = CMPDummy()
         self.engine = Engine(RandomDummy())
         self.engine.setcmp(self.cmp)
+        self.engine._board = Board(1, 1)
 
     def test_register(self):
         self.engine.register()
@@ -56,17 +57,43 @@ class TestEngine(unittest.TestCase):
         n2 = self.engine.getnibblebyid(n2)
         n3 = self.engine.register()
         n3 = self.engine.getnibblebyid(n3)
-        board = self.engine.getboard()
         # Wait for engine to start the game
         time.sleep(td.total_seconds())
         self.assertEquals(self.engine._status, RUNNING)
-        # Set the nibbles on the field
+        # Set up board for first game
+        board = self.engine.getboard()
+        board._width = 5
+        board._height = 5
+        board.settoken("*", 0, 0)
         n1.setPos(2, 2)
         board.settoken(n1, 2, 2)
         n2.setPos(1, 1)
         board.settoken(n2, 1, 1)
         n3.setPos(3, 4)
         board.settoken(n3, 3, 4)
+
+        # First move.
+        # nibble a
+        self.assertEquals(board.getnibbleview(2, 2),
+            "*.....b.....a..........c.")
+        self.engine.execturn(n1.getName(), 6)
+        self.assertFalse(n1.isAlive())
+        self.assertEquals(n2.getEnergy(), 67)
+        self.assertEquals(board.getnibbleview(2, 2),
+            "*.....b................c.")
+
+        #nibble b
+        self.assertFalse(self.engine.execturn(n2.getName(), 6) == -1)
+        #self.assertEquals(n2.getEnergy(), 69)
+        self.assertEquals(board.getnibbleview(2, 2),
+            "b......................c.")
+        self.engine.execturn(n3.getName(), 0)
+
+        # Second move.
+        #n1 is dead.
+        self.engine.execturn(n2.getName(), 23)
+        #n3 is dead.
+        # game ended
 
     def test_directionandenergy(self):
         (dx, dy) = self.engine._calcdirectionoffset(16)
