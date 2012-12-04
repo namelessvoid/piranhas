@@ -10,8 +10,8 @@ class Server():
     def __init__(self, commandProcessor, HOST, PORT, threadDelay):
         """Initializes the server.
                 Arguments:
-                    commandProcessor -- (commandprocessor)
-                    HOST -- (integer)
+                    commandProcessor -- (CommandProcessor)
+                    HOST -- (string)
                     PORT -- (integer)
                     threadDelay -- (integer) This is the number of seconds execution to be suspended"""
 
@@ -24,7 +24,6 @@ class Server():
         try:
             self.listenThreadServer = threading.Thread(target=self.listen, args=(HOST, PORT, threadDelay))
             self.listenThreadServer.start()
-            print self.listenThreadServer
             self._logger.info('Serverthread started!')
         except:
             self._logger.warning('Unable to start listenThreadServer')
@@ -45,7 +44,11 @@ class Server():
 
         self.s = socket.socket()
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind((self.HOST, self.PORT))
+        try:
+            self.s.bind((self.HOST, self.PORT))
+        except:
+            self._logger.warning('Unable to bind HOST and PORT to the socket!')
+
         self._logger.info("Serversocket .bind succeeded: HOST %s, PORT %s)"  %(self.HOST, self.PORT))
         self.s.listen(1)
 
