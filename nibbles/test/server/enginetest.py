@@ -2,6 +2,7 @@
 
 import time
 import unittest
+import logging
 from nibbles.server.engine import *
 
 
@@ -9,9 +10,11 @@ class CMPDummy():
     """Dummy logger. Has to be replaced!"""
     def __init__(self):
         self.text = None
+        self.logger = NibbleStreamLogger("enginetest.cmpdummy")
 
     def send(self, nibbleid, board, energy, end=False):
         self.text = "%s;%s;%s;%s" % (nibbleid, board, energy, end)
+        self.logger.info(self.text)meine mu
 
 
 class RandomDummy():
@@ -25,6 +28,7 @@ class RandomDummy():
 class TestEngine(unittest.TestCase):
     def setUp(self):
         self.cmp = CMPDummy()
+        self.cmp.logger.setLevel(logging.INFO)
         self.engine = Engine(RandomDummy())
         self.engine.setcmp(self.cmp)
         self.engine._board = Board(1, 1)
@@ -47,9 +51,8 @@ class TestEngine(unittest.TestCase):
 
     def test_gameplay(self):
         # Init engine
-        td = datetime.timedelta(0, 3)
-        self.engine.setgamestart(datetime.datetime.now() + td)
-        self.engine.setrounds(0)
+        self.engine._logger.setLevel(logging.INFO)
+        self.engine.setrounds(2)
         # Get nibbles
         n1 = self.engine.register()
         n1 = self.engine.getnibblebyid(n1)
@@ -57,6 +60,9 @@ class TestEngine(unittest.TestCase):
         n2 = self.engine.getnibblebyid(n2)
         n3 = self.engine.register()
         n3 = self.engine.getnibblebyid(n3)
+        # set start time
+        td = datetime.timedelta(0, 3)
+        self.engine.setgamestart(datetime.datetime.now() + td)
         # Wait for engine to start the game
         time.sleep(td.total_seconds())
         self.assertEquals(self.engine._status, RUNNING)
@@ -83,7 +89,7 @@ class TestEngine(unittest.TestCase):
             "*.....b................c.")
 
         #nibble b
-        self.assertFalse(self.engine.execturn(n2.getName(), 6) == -1)
+        self.assertTrue(self.engine.execturn(n2.getName(), 6) != -1)
         #self.assertEquals(n2.getEnergy(), 69)
         self.assertEquals(board.getnibbleview(2, 2),
             "b......................c.")
@@ -91,9 +97,11 @@ class TestEngine(unittest.TestCase):
 
         # Second move.
         #n1 is dead.
+        self.assertEquals(self.engine.execturn(n1.getName(), 12), -1)
         self.engine.execturn(n2.getName(), 23)
         #n3 is dead.
         # game ended
+        self.assertEquals(self.engine.getgamestatus(), ENDED)
 
     def test_directionandenergy(self):
         (dx, dy) = self.engine._calcdirectionoffset(16)

@@ -73,7 +73,6 @@ class Engine():
         self._nibblelist.append(nibble)
         self._logger.info(("Register new nibble with ID '%s' at "
                     + "nibblelist pos %d") % (nibbleid, len(self._nibblelist)))
-        self._logger.info(self._nibblelist)
         return nibbleid
 
     def killnibble(self, nibbleid):
@@ -91,8 +90,8 @@ class Engine():
             nibble._energy = 0
             self._board.settoken(".", nibble._xpos, nibble._ypos)
             # if the current nibble was killed advance with next nibble
-            if self._nibblelist.current() == nibble:
-                self._currentnibbleid = self._nibblelist.next().getName()
+#            if self._nibblelist.current() == nibble:
+#                self._currentnibbleid = self._nibblelist.next().getName()
 
     def getnibblebyid(self, nibbleid):
         """Returns a reference to the nibble with nibbleid.
@@ -176,6 +175,7 @@ class Engine():
 
     def _startgame(self):
         """Starts the game"""
+        self._logger.info("Game started (gamestart: %s)" % self._gamestart)
         # Create board
         boardsize = self._fieldspernibble * len(self._nibblelist)
         self._board = Board(boardsize, boardsize)
@@ -193,11 +193,11 @@ class Engine():
         self._currentnibbleid = self._nibblelist.current().getName()
         # Set status to running
         self._status = RUNNING
-        self._logger.info("Game started (gamestart: %s)" % self._gamestart)
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
         # send board information to first nibble
         self._sendtocmp()
+        self._logger.info("Game start succesfull.")
         # TODO signal game end to cmp?
 
     def execturn(self, nibbleid, direction):
@@ -212,6 +212,9 @@ class Engine():
 
             TODO: Multiple combat"""
 
+        self._logger.info(("Try to execute turn of '%c' in round %i." +
+            " Current nibble is '%c'")
+            % (nibbleid, self._currentround, self._currentnibbleid))
         # Wrong player wanted to move
         if not nibbleid == self._currentnibbleid:
             return -1
@@ -233,7 +236,7 @@ class Engine():
 
         # 3.) combat / food consumption
         token = self._board.gettoken(newx, newy)
-        self._logger.warning(token)
+
         # enemy found?
         if token in self._nibblelist:
             self._fight(nibble, token)
@@ -251,7 +254,8 @@ class Engine():
             self._board.settoken('.', oldx, oldy)
 
         # 5.) game end?
-        if self._currentround == self._rounds or len(self._nibblelist) <= 1:
+        # TODO check if all nibbles are dead
+        if self._currentround == self._rounds: #or len(self._nibblelist) <= 1:
             self._endgame()
         # 6.) set next player
         else:
@@ -323,13 +327,20 @@ class Engine():
 
     def _nextnibble(self):
         """Sets the next nibble and restarts the timer."""
+        self._logger.info("_nextnibble: current nibble '%c'" %
+            self._currentnibbleid)
         while 1:
             nibble = self._nibblelist.next()
             # nibble is dead
             if not nibble.isAlive():
+                self._logger.info("in _nextnibble(): found dead nibble."
+                    + " Continuing...")
                 self._cmp.send(nibble.getName(), "", "")
             else:
                 break
+
+        self._logger.info("_nextnibble: previous nibble '%c', new nibble '%c'"
+            % (self._currentnibbleid, nibble.getName()))
 
         self._currentnibbleid = nibble.getName()
         self._timer = threading.Timer(self._turntimeout, self.execturn,
@@ -338,6 +349,7 @@ class Engine():
 
         # if first nibble is reached, one turn has passed
         if(self._nibblelist[0] == nibble):
+            self._logger.info("New round %i began." % self._currentround)
             self._currentround += 1
             self._dropfood()
 
