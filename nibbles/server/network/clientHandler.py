@@ -3,7 +3,7 @@ import time
 import logging
 
 class ClientHandler():
-    def __init__(self, commandProcessor, socket='', clientNumber=0, threadDelay=1):
+    def __init__(self, commandProcessor, socket, clientNumber=0, threadDelay=1):
         """Initialize the ClientHandler.
                 Arguments:
                     commandProcessor -- (CommandProcessor)
@@ -20,11 +20,9 @@ class ClientHandler():
         except thread.error:
             logging.warning("Unable to start listenThreadClientHandler %s" % self.clientNumber)
 
-
     def send(self, messageString):
         """Send messageString to the client."""
         self.socket.sendall(messageString)
-
 
     def listen(self, delay):
         """Listens on the client.
