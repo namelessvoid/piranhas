@@ -34,7 +34,7 @@ class Server():
     def listen(self, HOST='', PORT=1234, threadDelay=1):
         """Listens to the socket.
                 Arguments:
-                    HOST --  (integer).
+                    HOST --  (string).
                     PORT --  (integer).
                     delay -- (integer) This is the number of seconds execution to be suspended"""
         self.threadDelay = threadDelay

@@ -21,7 +21,9 @@ class ClientHandler():
             logging.warning("Unable to start listenThreadClientHandler %s" % self.clientNumber)
 
     def send(self, messageString):
-        """Send messageString to the client."""
+        """Send messageString to the client.
+                Arguments:
+                    messageString -- (string)"""
         self.socket.sendall(messageString)
 
     def listen(self, delay):
