@@ -4,7 +4,7 @@ from nibbles.server.engine import INIT
 
 class CommandProcessor():
     def __init__(self):
-        """Initialize the commandProcessor."""
+        """Initialize the CommandProcessor."""
 
         self.nibbleclientdict = {}
         self.engine = None
@@ -13,20 +13,20 @@ class CommandProcessor():
     def setserver(self, server):
         """Receives the instanz of the server and stores it.
                 Arguments:
-                    server -- (server)"""
+                    server -- (Server)"""
         self.server = server
 
     def setengine(self, engine):
         """Receives the instanz of the engine and stores it.
                 Arguments:
-                    engine -- (engine)"""
+                    engine -- (Engine)"""
         self.engine = engine
 
     def receive(self, data, clientNumber):
         """Receives and handles the messages from the clients.
                 Arguments:
-                    data --  (integer) defined in seconds.
-                    clientNumber --  (string) defined in seconds."""
+                    data --  (string).
+                    clientNumber --  (integer)"""
 
         data = data.strip()
         print data
@@ -78,10 +78,10 @@ class CommandProcessor():
 
 
     def send(self, nibbleid, board, energy, end = 'false'):
-        """Receives the instanz of the server and stores it.
+        """Forwards the board, energy and the end to server.sendTo
                 Arguments:
                     nibbleid -- (integer)
-                    board -- ()
+                    board -- (Board)
                     energy -- (integer)
                     end -- (boolean)"""
         if energy <= 0:
