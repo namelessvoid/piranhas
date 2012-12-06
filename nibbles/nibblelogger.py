@@ -11,6 +11,9 @@ class NibbleLogger(object):
     def log(self, level, message):
         self._logger.log(level, message)
 
+    def debug(self, message):
+        self._logger.debug(message)
+
     def info(self, message):
         self._logger.info(message)
 
