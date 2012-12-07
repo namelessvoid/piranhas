@@ -228,9 +228,9 @@ class Engine():
         self._timer.cancel()
 
         # 1.) direction
-        (dx, dy) = self._calcdirectionoffset(direction)
-
-        self._nibblestep(self, nibble, dx, dy)
+        deltas = self._calcdirectionoffset(direction)
+        for (dx, dy) in deltas:
+            self._nibblestep(nibble, dx, dy)
 
         # 5.) set next player
         self._nextnibble()
@@ -281,7 +281,9 @@ class Engine():
             Argument:
                 number - (int) between 0 and 24 which describes the direction.
             Return:
-                (dx, dy) - (int tuple) delta x and delta y
+                ((dx1, dy1), (dx2, dy2) -- touple of two int tuples which hold
+                the realtive x and y offsets to perform the move. If only one
+                step is needed to perform this step, the second touple is None.
             Raises:
                 ValueError"""
         if not 0 <= number <= 24:
@@ -291,11 +293,21 @@ class Engine():
             raise ValueError(msg)
 
         (x, y) = (number % 5 - 2, number / 5 - 2)
-        if abs(x * y) == 2:
+
+        # break up double steps into single steps
+        # if it's just a single step
+        if abs(max(x, y)) == 1:
+            return((x, y),)
+        # 'knight' like step
+        elif abs(x * y) == 2:
             # todo
-            return (x, y)
+            if abs(x) == 2:
+                return ((x / 2, 0), (x / 2, y))
+            else:
+                return ((0, y / 2), (x, y / 2))
+        # double step to the corners or in one direction
         else:
-            return (x, y)
+            return ((x / 2, y / 2), (x / 2, y / 2))
 
     def _calcenergycosts(self, dx, dy):
         """Calculate the energy that the nibble has to spend to move to the

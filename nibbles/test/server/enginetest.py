@@ -14,7 +14,7 @@ class CMPDummy():
 
     def send(self, nibbleid, board, energy, end=False):
         self.text = "%s;%s;%s;%s" % (nibbleid, board, energy, end)
-        self.logger.info(self.text)meine mu
+        self.logger.info(self.text)
 
 
 class RandomDummy():
@@ -51,7 +51,7 @@ class TestEngine(unittest.TestCase):
 
     def test_gameplay(self):
         # Init engine
-        self.engine._logger.setLevel(logging.INFO)
+        self.engine._logger.setLevel(logging.DEBUG)
         self.engine.setrounds(2)
         # Get nibbles
         n1 = self.engine.register()
@@ -104,17 +104,22 @@ class TestEngine(unittest.TestCase):
         self.assertEquals(self.engine.getgamestatus(), ENDED)
 
     def test_directionandenergy(self):
-        (dx, dy) = self.engine._calcdirectionoffset(16)
-        self.assertEquals(dx, -1)
-        self.assertEquals(dy, +1)
-        ec = self.engine._calcenergycosts(dy, dy)
+        d1 = self.engine._calcdirectionoffset(16)[0]
+        self.assertEquals(d1, (-1, 1))
+        ec = self.engine._calcenergycosts(d1[0], d1[1])
         self.assertEquals(ec, 3)
 
-        (dx, dy) = self.engine._calcdirectionoffset(4)
-        self.assertEquals(dx, +2)
-        self.assertEquals(dy, -2)
-        ec = self.engine._calcenergycosts(dx, dy)
+        (d1, d2) = self.engine._calcdirectionoffset(4)
+        self.assertEquals(d1, (+1, -1))
+        self.assertEquals(d2, (+1, -1))
+        ec = self.engine._calcenergycosts(d1[0] + d2[0], d1[1] + d2[1])
         self.assertEquals(ec, 7)
+
+        (d1, d2) = self.engine._calcdirectionoffset(21)
+        self.assertEquals(d1, (0, +1))
+        self.assertEquals(d2, (-1, +1))
+        ec = self.engine._calcenergycosts(d1[0] + d2[0], d1[1] + d2[1])
+        self.assertEquals(ec, 6)
 
     def test_fight(self):
         aid = self.engine.register()
