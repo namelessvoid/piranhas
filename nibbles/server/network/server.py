@@ -49,12 +49,13 @@ class Server():
         except:
             self._logger.warning('Unable to bind HOST and PORT to the socket!')
 
-        self._logger.info("Serversocket .bind succeeded: HOST %s, PORT %s)"  %(self.HOST, self.PORT))
+        self._logger.info('Serversocket .bind succeeded: HOST %s, PORT %s'  %(self.HOST, self.PORT))
+        self._logger.info('Waiting for clients.')
         self.s.listen(1)
 
         while True:
             c, (clienthost, clientport) = self.s.accept()
-            logging.info('Verbunden mit %s:%d' % (clienthost, clientport))
+            self._logger.info('Connected with %s:%d' % (clienthost, clientport))
             self.clientList.insert(self.clientNumber ,ClientHandler(self.commandProcessor, c, self.clientNumber, self.threadDelay))
             self.clientNumber += 1
 
@@ -63,6 +64,7 @@ class Server():
                 Arguments:
                     currentClientNumber -- (integer)
                     message -- (string) """
+        self._logger.info('"' + message + '"' + ' was sent to the client with the id ' + str(currentClientNumber))
         self.clientList[currentClientNumber].send(message)
 
 
