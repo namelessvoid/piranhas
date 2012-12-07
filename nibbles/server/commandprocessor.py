@@ -29,8 +29,6 @@ class CommandProcessor():
                     clientNumber --  (integer)"""
 
         data = data.strip()
-        print data
-
 
         if data == 'anmeldung moeglich@':
             if self.engine.getgamestatus() == INIT:
