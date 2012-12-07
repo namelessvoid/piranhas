@@ -2,7 +2,7 @@
 
 import sys
 from nibbles.nibble import Nibble
-
+from nibbles.nibblelogger import *
 
 class Board(object):
 
@@ -11,6 +11,8 @@ class Board(object):
         self._width = int(x)
         self._height = int(y)
         self.reset()
+        self._logger = NibbleStreamLogger("nibbles.board")
+        self._logger.setLevel(logging.INFO)
 
     def reset(self):
         """resets the board"""
@@ -86,6 +88,24 @@ class Board(object):
     def calcposition(self, x, y):
         """calculates new coordinates from x and y"""
         return (x % self._width, y % self._height)
+
+    def tostring(self):
+        """Returns the full content of the board as string."""
+        self._logger.debug("Getting board string from board with %i x %i"
+            % (self._width, self._height))
+        self._logger.debug("Iterating over %s x %s"
+             % (range(self._height), range(self._width)))
+
+        string = ""
+        for i in range(self._height):
+            for j in range(self._width):
+                self._logger.debug("Try to access [%i][%i]" % (i, j))
+                element = self._field[i][j]
+                if isinstance(element, Nibble):
+                    element = element.getName()
+                string += element
+        return string
+
 
 class BoardRenderer(object):
     def printboard(board):
