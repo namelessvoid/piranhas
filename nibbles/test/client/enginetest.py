@@ -17,5 +17,5 @@ class TestEngine(unittest.TestCase):
         self.assertEqual(sys.stdout.getvalue(),"2012-11-17 00:00:00@")
 
     def test_printMessage(self):
-        self._engine.printMessage("message")
+        self._engine.printmessage("message")
         self.assertEqual(sys.stdout.getvalue(),"message")
