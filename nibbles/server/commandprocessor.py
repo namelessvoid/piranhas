@@ -42,7 +42,7 @@ class CommandProcessor():
             else:
                     self.server.sendTo(clientNumber, 'nein@')
         elif data == 'anmelden@':
-            if clientNumber in self.nibbleclientdict:
+            if clientNumber in self.nibbleclientdict.values():
                 self.server.sendTo(clientNumber, 'fehler@')
             else:
                 nibblechar = None
