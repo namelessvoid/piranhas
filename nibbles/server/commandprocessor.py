@@ -55,7 +55,7 @@ class CommandProcessor():
                 if nibblechar != None:
                     self.server.sendTo(clientNumber, '%s@' %nibblechar)
 
-        elif clientNumber in self.nibbleclientdict:
+        elif clientNumber in self.nibbleclientdict.values():
             if data == 'weltgroesse@':
                 if self.engine.getgamestatus() == INIT:
                     self.server.sendTo(clientNumber, 'fehler@')
@@ -69,18 +69,22 @@ class CommandProcessor():
             elif 2 <= len(data) <= 3:
                 if data.endswith('@'):
                     directionnumber = data.rstrip("@")
-                    if 0 >= directionnumber <= 24 and directionnumber.isdigit():
-                        if self.engine.execturn(self.nibbleclientdict.keys()[self.nibbleclientdict.values().index(clientNumber)], directionnumber) == -1:
-                            self._logger.warning("Couldn't execute move")
-                            self.server.sendTo(clientNumber, 'fehler@')
+                    if directionnumber.isdigit():
+                        directionnumber = int(directionnumber)
+                        if 0 <= directionnumber <= 24:
+                            if self.engine.execturn(self.nibbleclientdict.keys()[self.nibbleclientdict.values().index(clientNumber)], directionnumber) == -1:
+                                self._logger.warning("Couldn't execute move")
+                                self.server.sendTo(clientNumber, 'fehler@')
+                            else:
+                                self._logger.info('Movement succeeded!')
                         else:
-                            self._logger.info('Movement succeeded!')
+                            self.server.sendTo(clientNumber, 'fehler4@')
                     else:
-                        self.server.sendTo(clientNumber, 'fehler@')
+                        self.server.sendTo(clientNumber, 'fehler3@')
                 else:
-                    self.server.sendTo(clientNumber, 'fehler@')
+                    self.server.sendTo(clientNumber, 'fehler2@')
         else:
-            self.server.sendTo(clientNumber,'fehler@')
+            self.server.sendTo(clientNumber,'fehler1@')
 
 
     def send(self, nibbleid, board, energy, end = 'false'):
