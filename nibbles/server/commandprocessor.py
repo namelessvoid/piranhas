@@ -11,18 +11,21 @@ class CommandProcessor():
         self.engine = None
         self.server = None
         self.gamestarttime = gamestarttime
+        self._logger = NibbleStreamLogger("server.commandprocessor", logging.INFO)
 
     def setserver(self, server):
         """Receives the instanz of the server and stores it.
                 Arguments:
                     server -- (Server)"""
         self.server = server
+        self._logger.info('Server has been set')
 
     def setengine(self, engine):
         """Receives the instanz of the engine and stores it.
                 Arguments:
                     engine -- (Engine)"""
         self.engine = engine
+        self._logger.info('Engine has been set')
 
     def receive(self, data, clientNumber):
         """Receives and handles the messages from the clients.
@@ -31,6 +34,7 @@ class CommandProcessor():
                     clientNumber --  (integer)"""
 
         data = data.strip()
+        self._logger.info('Receive "' + data + '" from id %d' % clientNumber)
 
         if data == 'anmeldung moeglich@':
             if self.engine.getgamestatus() == INIT:
@@ -57,29 +61,24 @@ class CommandProcessor():
                     self.server.sendTo(clientNumber, 'fehler@')
                 else:
                     x, y = self.engine.getworlddimentions()
-                    self.server.sendTo(clientNumber, '%dx%d@' %x, y)
+                    self.server.sendTo(clientNumber, '%dx%d@' %(x, y))
 
             elif data == 'spielbeginn@':
                 self.server.sendTo(clientNumber, self.gamestarttime)
 
             elif 2 <= len(data) <= 3:
-                directionnumber = None
-                if '@' in data:
-                    directionnumber = data.strip("@")
-                    if 0 >= directionnumber <= 24:
-                        for value in self.nibbleclientdict.items():
-                            if value[1] == clientNumber:
-                                self.nibbleid = value[0]
-
-                            if self.engine.execturn(self.nibbleid, directionnumber) == -1:
-                                self._logger.warning('')
-                                self.server.sendTo(clientNumber, 'fehler@')
-                            else:
-                                self._logger.info('Movement succeeded!')
-
+                if data.endswith('@'):
+                    directionnumber = data.rstrip("@")
+                    if 0 >= directionnumber <= 24 and directionnumber.isdigit():
+                        if self.engine.execturn(self.nibbleclientdict.keys()[self.nibbleclientdict.values().index(clientNumber)], directionnumber) == -1:
+                            self._logger.warning("Couldn't execute move")
+                            self.server.sendTo(clientNumber, 'fehler@')
+                        else:
+                            self._logger.info('Movement succeeded!')
                     else:
                         self.server.sendTo(clientNumber, 'fehler@')
-
+                else:
+                    self.server.sendTo(clientNumber, 'fehler@')
         else:
             self.server.sendTo(clientNumber,'fehler@')
 
