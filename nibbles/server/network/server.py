@@ -55,7 +55,7 @@ class Server():
 
         while True:
             c, (clienthost, clientport) = self.s.accept()
-            self._logger.info('Connected with %s:%d' % (clienthost, clientport))
+            self._logger.info('Connected with %s:%d and allocated to id %d' % (clienthost, clientport,self.clientNumber))
             self.clientList.insert(self.clientNumber ,ClientHandler(self.commandProcessor, c, self.clientNumber, self.threadDelay))
             self.clientNumber += 1
 
@@ -64,7 +64,7 @@ class Server():
                 Arguments:
                     currentClientNumber -- (integer)
                     message -- (string) """
-        self._logger.info('"' + message + '"' + ' was sent to the client with the id ' + str(currentClientNumber))
+        self._logger.info('"' + message + '" was sent to the client with the id %d' % currentClientNumber)
         self.clientList[currentClientNumber].send(message)
 
 

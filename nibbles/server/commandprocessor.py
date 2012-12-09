@@ -1,6 +1,7 @@
 import logging
 from nibbles.server.serverexceptions import *
 from nibbles.server.engine import INIT
+from nibbles.nibblelogger import NibbleStreamLogger
 
 class CommandProcessor():
     def __init__(self):
@@ -9,18 +10,21 @@ class CommandProcessor():
         self.nibbleclientdict = {}
         self.engine = None
         self.server = None
+        self._logger = NibbleStreamLogger("server.commandprocessor", logging.INFO)
 
     def setserver(self, server):
         """Receives the instanz of the server and stores it.
                 Arguments:
                     server -- (Server)"""
         self.server = server
+        self._logger.info('Server has been set')
 
     def setengine(self, engine):
         """Receives the instanz of the engine and stores it.
                 Arguments:
                     engine -- (Engine)"""
         self.engine = engine
+        self._logger.info('Engine has been set')
 
     def receive(self, data, clientNumber):
         """Receives and handles the messages from the clients.
@@ -29,6 +33,7 @@ class CommandProcessor():
                     clientNumber --  (integer)"""
 
         data = data.strip()
+        self._logger.info('Received: "' + data + '" from id %d' % clientNumber)
 
         if data == 'anmeldung moeglich@':
             if self.engine.getgamestatus() == INIT:
@@ -61,16 +66,13 @@ class CommandProcessor():
                 self.server.sendTo(clientNumber, self.configloader.getgamestartime())
 
             elif 2 <= len(data) <= 3:
-                directionnumber = None
-                if '@' in data:
-                    directionnumber = data.strip("@")
-                    if 0 >= directionnumber <= 24:
-                        #if self.engine.getcurrentnibbleid() == self.nibbleclientdict. :
-                            #self.nibbleclientdict.values().index(clientNumber)
-                        pass
+                if data.endswith('@'):
+                    directionnumber = data.rstrip("@")
+                    if 0 >= directionnumber <= 24 and directionnumber.isdigit():
+                        nibbleid = self.nibbleclientdict.keys()[self.nibbleclientdict.values().index(clientNumber)]
+                        self.engine.execturn(nibbleid, directionnumber)
                     else:
                         self.server.sendTo(clientNumber, 'fehler@')
-
         else:
             self.server.sendTo(clientNumber,'fehler@')
 
