@@ -14,5 +14,9 @@ class ServerGui(QtGui.QMainWindow):
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     servergui = ServerGui()
-    servergui.ui.show()
+    servergui.show()
     sys.exit(app.exec_())
+
+
+
+
