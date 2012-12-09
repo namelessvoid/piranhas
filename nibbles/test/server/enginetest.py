@@ -64,7 +64,7 @@ class TestEngine(unittest.TestCase):
         td = datetime.timedelta(0, 3)
         self.engine.setgamestart(datetime.datetime.now() + td)
         # Wait for engine to start the game
-        time.sleep(td.total_seconds())
+        time.sleep(td.total_seconds()+1)
         self.assertEquals(self.engine._status, RUNNING)
         # Set up board for first game
         board = self.engine.getboard()
