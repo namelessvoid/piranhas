@@ -18,7 +18,7 @@ foodpernibble = configparser.getint("engine", "foodpernibble")
 fieldspernibble = configparser.getint("engine", "fieldspernibble")
 
 # instantiate objects
-commandprocessor = CommandProcessor()
+commandprocessor = CommandProcessor(starttime)
 server = Server(commandprocessor, host, port, 1)
 commandprocessor.setserver(server)
 random = random.Random()

@@ -1,14 +1,19 @@
 import logging
 from nibbles.server.serverexceptions import *
 from nibbles.server.engine import INIT
+from nibbles.nibblelogger import NibbleStreamLogger
 
 class CommandProcessor():
-    def __init__(self):
+    def __init__(self, gamestarttime):
         """Initialize the CommandProcessor."""
 
         self.nibbleclientdict = {}
         self.engine = None
         self.server = None
+        self.gamestarttime = gamestarttime
+
+        # create logger
+        self._logger = NibbleStreamLogger("server.commandprocessor", logging.INFO)
 
     def setserver(self, server):
         """Receives the instanz of the server and stores it.
@@ -55,19 +60,26 @@ class CommandProcessor():
                     self.server.sendTo(clientNumber, 'fehler@')
                 else:
                     x, y = self.engine.getworlddimentions()
-                    self.server.sendTo(clientNumber, '%dx%d@' %x, y)
+                    self.server.sendTo(clientNumber, '%s%s@' % (x, y))        #not sure about the types
 
             elif data == 'spielbeginn@':
-                self.server.sendTo(clientNumber, self.configloader.getgamestartime())
+                self.server.sendTo(clientNumber, self.gamestarttime)
 
             elif 2 <= len(data) <= 3:
                 directionnumber = None
                 if '@' in data:
                     directionnumber = data.strip("@")
                     if 0 >= directionnumber <= 24:
-                        #if self.engine.getcurrentnibbleid() == self.nibbleclientdict. :
-                            #self.nibbleclientdict.values().index(clientNumber)
-                        pass
+                        for value in self.nibbleclientdict.items():
+                            if value[1] == clientNumber:
+                                self.nibbleid = value[0]
+
+                            if self.engine.execturn(self.nibbleid, directionnumber) == -1:
+                                self._logger.warning('')
+                                self.server.sendTo(clientNumber, 'fehler@')
+                            else:
+                                self._logger.info('Movement succeeded!')
+
                     else:
                         self.server.sendTo(clientNumber, 'fehler@')
 
