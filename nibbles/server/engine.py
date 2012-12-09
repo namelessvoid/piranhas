@@ -27,7 +27,7 @@ class Engine():
                 clones bahaviour of random.randint(...)"""
         # create logger
         self._logger = NibbleStreamLogger("server.engine")
-        self._logger.setLevel(logging.WARNING)
+        self._logger.setLevel(logging.DEBUG)
 
         # Initializes the engine.
         self._nibblelist = CircularList()
@@ -46,6 +46,7 @@ class Engine():
         self._currentround = 0
         self._starttimer = None
         self._energycostlist = [1, 2, 5, 2, 3, 6, 5, 6, 7]
+        self._rounds = 10
         self._boardsaves = []
 
         # Create the board
@@ -147,6 +148,14 @@ class Engine():
                 number -- (integer) the number of rounds"""
         self._rounds = number
 
+    def setturntimeout(self, seconds):
+        """Sets the timeout of one turn in seconds. When it's nibble X's turn
+            and X does not move within the given period, the engine assumes
+            that X does not want to move and continues.
+            Arguments:
+                seconds -- (integer) the timeout as integer"""
+        self._turntimeout = seconds
+
     def setcmp(self, cmp):
         """Sets the command processor of the engine.
             Arguments:
@@ -186,23 +195,24 @@ class Engine():
 
         # Place nibbles randomly on the board TODO
         for n in self._nibblelist:
-            x = self._random.randint(0, self._board.getwidth)
-            y = self._random.randint(0, self._board.getheight)
+            x = self._random.randint(0, self._board.getwidth())
+            y = self._random.randint(0, self._board.getheight())
             self._board.settoken(n, x, y)
             n.setPos(x, y)
 
         # Set first player
         self._currentnibbleid = self._nibblelist.current().getName()
         # Set status to running
-        self._status = RUNNING
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
+        self._timer.start()
         # send board information to first nibble
         self._saveboard()
         self._sendtocmp()
         self._logger.debug("Game start succesfull.")
         self._logger.info("Began round %i of %i"
             % (self._currentround, self._rounds))
+        self._status = RUNNING
 
     def execturn(self, nibbleid, direction):
         """Moves a nibble aka execute one game turn:
@@ -363,12 +373,12 @@ class Engine():
 
             # if first nibble is reached, one turn has passed
             if(self._nibblelist[0] == nibble):
+                self._saveboard()
                 # if this was the last round stop the game
                 if self._currentround >= self._rounds:
                     self._endgame()
                     return
 
-                self._saveboard()
                 self._currentround += 1
                 self._logger.info("Began round %i of %i."
                     % (self._currentround, self._rounds))
@@ -388,6 +398,7 @@ class Engine():
         self._currentnibbleid = nibble.getName()
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
+        self._timer.start()
         self._sendtocmp()
 
     def _sendtocmp(self):
@@ -399,7 +410,8 @@ class Engine():
         boardview = ""
         if nibble.isAlive():
             energy = nibble.getEnergy()
-            boardview = self._board.getnibbleview(nibble._xpos, nibble._ypos)
+            (x, y) = nibble.getPos()
+            boardview = self._board.getnibbleview(x, y, energy)
 
         self._cmp.send(self._currentnibbleid, boardview, energy)
 
