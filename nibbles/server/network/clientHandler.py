@@ -37,19 +37,22 @@ class ClientHandler():
                 Arguments:
                     delay --  (integer) defined in seconds."""
 
-        try:
-            BUF_SIZE = 1024
-            self.data = None
-            while True:
-                time.sleep(delay)
+
+        BUF_SIZE = 1024
+        self.data = None
+        while True:
+            time.sleep(delay)
+            try:
                 self.data = self.socket.recv(BUF_SIZE)
-                if self.data:
-                    self._logger.info('Received: "' + self.data + '"')
-                    self.commandProcessor.receive(self.data, self.clientNumber)
-                    self.data = ''
-        except Exception as e:
-            self._logger.warning('Unable to receive data from client')
-            raise e
+            except Exception as e:
+                self._logger.warning('Unable to receive data from client')
+                #raise e
+
+            if self.data:
+                self._logger.info('Received: "' + self.data + '"')
+                self.commandProcessor.receive(self.data, self.clientNumber)
+                self.data = ''
+
 
 if __name__ == "__main__":
     pass

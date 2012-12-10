@@ -11,6 +11,13 @@ class ServerGui(QtGui.QMainWindow):
             text = "Logger 08:08:2012 - INFO: Test logger" + str(i)
             self.ui.logger.append(text.rstrip())
 
+    def update(self):
+        pass
+
+
+
+
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     servergui = ServerGui()

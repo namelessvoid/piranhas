@@ -145,7 +145,7 @@ color:#fff;
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>460</y>
+       <y>450</y>
        <width>441</width>
        <height>81</height>
       </rect>
@@ -153,7 +153,6 @@ color:#fff;
      <property name="font">
       <font>
        <pointsize>-1</pointsize>
-       <kerning>true</kerning>
       </font>
      </property>
      <property name="styleSheet">
@@ -161,7 +160,23 @@ color:#fff;
 background:transparent;
 font-size:10px;
 color:yellow;
-}</string>
+}
+
+    QScrollBar:vertical {
+        border: none;
+        background: #333;
+        width: 20px;
+		position:absolute;
+		left:0px;
+		top: 200px;
+    }
+   </string>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
      <property name="readOnly">
       <bool>true</bool>
