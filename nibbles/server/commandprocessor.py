@@ -87,7 +87,7 @@ class CommandProcessor():
             self.server.sendTo(clientNumber,'fehler1@')
 
 
-    def send(self, nibbleid, board, energy, end = 'false'):
+    def send(self, nibbleid, board, energy, end=False):
         """Forwards the board, energy and the end to server.sendTo
                 Arguments:
                     nibbleid -- (integer)
