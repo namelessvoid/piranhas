@@ -231,6 +231,9 @@ class Engine():
         # Wrong player wanted to move
         if not nibbleid == self._currentnibbleid:
             return -1
+        if not self._status == RUNNING:
+            self._logger.info("Cannot execute turn. Game not running!")
+            return -1
 
         nibble = self.getnibblebyid(self._currentnibbleid)
 
