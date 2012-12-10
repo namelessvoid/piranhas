@@ -55,6 +55,8 @@ class Engine():
         self._cmp = None
         # Set the random object
         self._random = randobj
+        # Lock object
+        self._lock = threading.RLock()
 
     def register(self):
         """Registeres a new nibble.
@@ -62,6 +64,8 @@ class Engine():
                 The id (char) of new nibble.
             Raises:
                 RegisterNibbleFailedException"""
+        self._lock.lock()
+        self._lock.release()
         if len(self._nibblelist) == len(self._idlist):
             raise RegisterNibbleFailedException("No more IDs left."
                         + "Cannot register more nibbles!")
@@ -75,6 +79,7 @@ class Engine():
         self._nibblelist.append(nibble)
         self._logger.info(("Register new nibble with ID '%s' at "
                     + "nibblelist pos %d") % (nibbleid, len(self._nibblelist)))
+
         return nibbleid
 
     def killnibble(self, nibbleid):
