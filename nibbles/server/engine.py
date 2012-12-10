@@ -244,6 +244,7 @@ class Engine():
 
         # 5.) set next player
         self._nextnibble()
+        return 0
 
     def _nibblestep(self, nibble, dx, dy):
         """Moves the nibble one step wide. This is needed if the nibble does a
@@ -262,7 +263,7 @@ class Engine():
 
         #combat / food consumption
         token = self._board.gettoken(newx, newy)
-        if token in self._nibblelist:
+        if token in self._nibblelist and token != nibble:
             self._fight(nibble, token)
         elif token == "*":
             nibble.setEnergy(nibble.getEnergy() + self._energyperfood)
@@ -283,7 +284,7 @@ class Engine():
         # Send past 10 boards to clients
         for nibble in self._nibblelist:
             for board in self._boardsaves:
-                self._cmp.send(nibble.getName(), board, "")
+                self._cmp.send(nibble.getName(), board, 0, True)
 
     def _calcdirectionoffset(self, number):
         """Takes a direction number between 0 and 24 to calculate the x and
@@ -399,6 +400,7 @@ class Engine():
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
         self._timer.start()
+        self._logger.debug("Restartet turn timeout timer.")
         self._sendtocmp()
 
     def _sendtocmp(self):
@@ -406,7 +408,7 @@ class Engine():
             the part of the board that's visible to the nibble
             and its energy."""
         nibble = self.getnibblebyid(self._currentnibbleid)
-        energy = ""
+        energy = 0
         boardview = ""
         if nibble.isAlive():
             energy = nibble.getEnergy()
