@@ -6,6 +6,7 @@ import threading
 from socket import *
 from nibbles.nibblelogger import *
 from nibbles.board import *
+from nibbles.client.ai import *
 from nibbles.client.network.networkinterface import *
 
 class DummyServer(threading.Thread): #to be removed
@@ -20,7 +21,7 @@ class DummyServer(threading.Thread): #to be removed
 
     def run(self):
         c, (clienthost, clientport) = self._s.accept()
-        c.sendall("5;....<...a**.**<<<j*......;@")
+        c.sendall("30;..*....*............*..*.;@")
         data = c.recv(1024)
         print("Vom Server: "+data+"\n")
 
@@ -53,7 +54,7 @@ class Engine(threading.Thread):
         self._ai = ai
         self._logger = NibbleStreamLogger("client.engine")
 
-    def recievecommand(self):
+    def receivecommand(self):
         """Recieves a message from networkinterface and return it"""
         command = self._ni.receivemessage()
         return command
@@ -87,46 +88,27 @@ class Engine(threading.Thread):
 
     def run(self):
         """Commandprocessor for the engine:
-           in functions dictionary are server messages mapped to a function
-           - ... : <function_name> => calls only the function without parameters
-           - ... : (<function_name>,"") => calls the function with message from server as parameter
-           - ... : (<function_name>,param) => calls the function with parameter param"""
+           in functions dictionary are server messages mapped to a function"""
+
         functions = {
-            "ja@" : self.connecttoserver,
-            "nein@" : (self.printmessage,"Anmeldung nicht moeglich"),
-            "\D{1}@" : self.startgame,
-            "\d+x\d+@" : (self.printmessage,""),
-            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}@" : (self.printmessage,""), #do something
-            "(;|\d{1};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : (self.printmessage,"") #self.givetoai(message)
+            "ja@" : lambda param: self.connecttoserver(),
+            "nein@" : lambda param: self.printmessage("Anmeldung nicht moeglich"),
+            "\D{1}@" : lambda param: self.startgame(),
+            "\d+x\d+@" : lambda param: self.printmessage(param),
+            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}@" : lambda param: self.printmessage(param), #do something
+            "(;|\d{1,2};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.sendcommand(str(self._ai.think(param.split(";")[1], param.split(";")[0])))
         }
+
         #while 1:
         self._logger.info(" Waiting for command...")
-        command = self.recievecommand()
-        self._logger.info(" Recieved command: %s" % command)
+        command = self.receivecommand()
+        self._logger.info(" Client Received command: %s" % command)
+
         for i, key in enumerate(functions):
-            if command == key:
-                if isinstance(functions[command], tuple):
-                    func, param = functions[command]
-                    if param == "":
-                        func(command)
-                    else:
-                        func(param)
-                    break
-                else:
-                    functions[command]()
-                    break
-            elif re.match(key, command):
-                if isinstance(functions[key], tuple):
-                    func, param = functions[key]
-                    if param == "":
-                        func(command)
-                    else:
-                        func(param)
-                    break
-                else:
-                    functions[key]()
-                    break
-            elif i == len(functions)-1:
+            if re.match(key, command):
+                functions[key](command)
+                break
+            elif i == len(functions) - 1:
                 self.printmessage("fehler@\n")
                 break
 
@@ -134,8 +116,10 @@ if __name__== "__main__":
 
     server = DummyServer('', 1234)
     client = DummyClient("localhost", 1234)
+    board = Board(10,10)
+    ai = AI()
 
     #ni = NetworkInterface("localhost", 1234)
 
-    engine = Engine(client)
-    engine.run()
+    engine = Engine(client, board, ai)
+    engine.start()
