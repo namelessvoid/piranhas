@@ -397,7 +397,7 @@ class Engine():
             if isinstance(token, Nibble):
                 token.setEnergy(token.getEnergy() + self._energyperfood)
             else:
-                self._board.settoken("*", ry, ry)
+                self._board.settoken("*", rx, ry)
 
     def _nextnibble(self):
         """Sets the next nibble and restarts the timer."""
