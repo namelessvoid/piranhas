@@ -2,6 +2,7 @@
 
 import re
 import sys
+import time
 import threading
 from socket import *
 from nibbles.nibblelogger import *
@@ -21,7 +22,7 @@ class DummyServer(threading.Thread): #to be removed
 
     def run(self):
         c, (clienthost, clientport) = self._s.accept()
-        c.sendall("30;..*....*............*..*.;@")
+        c.sendall("30;..*....*.>..A....<..*..*.;@")
         data = c.recv(1024)
         print("Vom Server: "+data+"\n")
 
@@ -52,12 +53,12 @@ class Engine(threading.Thread):
         self._ni = ni
         self._board = board
         self._ai = ai
+        self._gamerun = True
         self._logger = NibbleStreamLogger("client.engine")
 
     def receivecommand(self):
         """Recieves a message from networkinterface and return it"""
-        command = self._ni.receivemessage()
-        return command
+        return self._ni.getmessage()
 
     def sendcommand(self, command):
         self._ni.sendmessage(command)
@@ -82,9 +83,19 @@ class Engine(threading.Thread):
         """prints a message to stdout"""
         sys.stdout.write(message)
 
-    def printboard(self):
+    def renderboard(self, view, energy):
         """Renders the board"""
-        BoardRenderer.printboard(self._board)
+        #BoardRenderer.renderboard(view, energy)
+
+    def handlemessage(self, message):
+        """Handles the message from the server"""
+        energy = message.split(";")[0]
+        view = message.split(";")[1]
+        field = message.split(";")[2]
+        if view != "ende":
+            self.sendcommand( str( self._ai.think(view, energy) )+"@" )
+        else:
+            self._gamerun = False
 
     def run(self):
         """Commandprocessor for the engine:
@@ -95,27 +106,31 @@ class Engine(threading.Thread):
             "nein@" : lambda param: self.printmessage("Anmeldung nicht moeglich"),
             "\D{1}@" : lambda param: self.startgame(),
             "\d+x\d+@" : lambda param: self.printmessage(param),
-            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}@" : lambda param: self.printmessage(param), #do something
-            "(;|\d{1,2};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.sendcommand(str(self._ai.think(param.split(";")[1], param.split(";")[0])))
+            "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}" : lambda param: self.printmessage(param), #do something
+            "(;|\d{1,2};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.handlemessage(param)
         }
 
-        #while 1:
-        self._logger.info(" Waiting for command...")
-        command = self.receivecommand()
-        self._logger.info(" Client Received command: %s" % command)
+        while self._gamerun:
+            command = self.receivecommand()
 
-        for i, key in enumerate(functions):
-            if re.match(key, command):
-                functions[key](command)
-                break
-            elif i == len(functions) - 1:
-                self.printmessage("fehler@\n")
-                break
+            if command:
+                self._logger.info(" Client Received command: %s" % command)
+
+                for i, key in enumerate(functions):
+                    if re.match(key, command):
+                        functions[key](command)
+                        break
+                    elif i == len(functions) - 1:
+                        self.printmessage("fehler@\n")
+                        break
+
+            time.sleep(0.4)
 
 if __name__== "__main__":
 
-    server = DummyServer('', 1234)
-    client = DummyClient("localhost", 1234)
+    #server = DummyServer('', 1234)
+    #client = DummyClient("localhost", 1234)
+    client = NetworkInterface("localhost", 1234)
     board = Board(10,10)
     ai = AI()
 
@@ -123,3 +138,4 @@ if __name__== "__main__":
 
     engine = Engine(client, board, ai)
     engine.start()
+    engine.sendcommand("anmeldung moeglich@")
