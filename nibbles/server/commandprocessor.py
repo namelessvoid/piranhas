@@ -94,9 +94,9 @@ class CommandProcessor():
                     board -- (Board)
                     energy -- (integer)
                     end -- (boolean)"""
-        if energy <= 0:
-            self.server.sendTo(self.nibbleclientdict[nibbleid], ';;@')
-        elif end:
+        #if energy <= 0:
+        #    self.server.sendTo(self.nibbleclientdict[nibbleid], ';;@')
+        if end:
             self.server.sendTo(self.nibbleclientdict[nibbleid], '%s;ende;%s@' %(energy, board))
         else:
             self.server.sendTo(self.nibbleclientdict[nibbleid], '%s;%s;@' %(energy,  board))
