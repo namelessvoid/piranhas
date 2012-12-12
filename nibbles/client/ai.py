@@ -54,7 +54,7 @@ class eye(object):
         self.widerange = widerange
         self.innerweight = 1.0
         self.outerweight = 0.75
-        self.dict = {'.'  : 0.0 , '*' : 0.5 , '<' : 1.0 , '>' : -1.0}
+        self.dict = {'.'  : 0.0 , '*' : 0.5 , '<' : 1.0 , '>' : -1.0, '=' : 1.0}
 
     def getfields(self):
         return self.closerange, self.widerange
