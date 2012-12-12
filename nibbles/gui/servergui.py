@@ -1,6 +1,7 @@
 import sys
 from PyQt4 import QtGui, QtCore, uic
 from logging import log
+import datetime
 
 
 class ServerGui(QtGui.QMainWindow):
@@ -15,10 +16,24 @@ class ServerGui(QtGui.QMainWindow):
         self._engine = engine
         self._engine.updatesignal.register(self.update)
 
+        self.ui.startgame.clicked.connect(self.gamestart)
+
     def update(self):
-        pass
+        self.board = self._engine.getboard()
+        self.view = self.board.tostring()
+
+        c=0
+        for i in self.view:
+            c+=1
+            self.ui.boardtest.insertPlainText(i)
+
+            if c == self.board._width:
+                self.ui.boardtest.append('')
+                c=0
 
 
+    def gamestart(self):
+        self._engine.setgamestart(datetime.datetime.now())
 
 
 
@@ -29,14 +44,6 @@ class ServerGui(QtGui.QMainWindow):
 
 
 
-
-
-
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    servergui = ServerGui()
-    servergui.show()
-    sys.exit(app.exec_())
 
 
 
