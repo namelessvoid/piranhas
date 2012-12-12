@@ -57,6 +57,8 @@ class Engine():
         self._random = randobj
         # Lock object
         self._lock = threading.RLock()
+        # Update signal
+        self.updatesignal = EngineSignal()
 
     def register(self):
         """Registeres a new nibble.
@@ -64,8 +66,10 @@ class Engine():
                 The id (char) of new nibble.
             Raises:
                 RegisterNibbleFailedException"""
-        self._lock.lock()
-        self._lock.release()
+      #  with self._lock:
+       #     print "Hallo!"
+
+        self._lock.acquire()
         if len(self._nibblelist) == len(self._idlist):
             raise RegisterNibbleFailedException("No more IDs left."
                         + "Cannot register more nibbles!")
@@ -79,7 +83,7 @@ class Engine():
         self._nibblelist.append(nibble)
         self._logger.info(("Register new nibble with ID '%s' at "
                     + "nibblelist pos %d") % (nibbleid, len(self._nibblelist)))
-
+        self._lock.release()
         return nibbleid
 
     def killnibble(self, nibbleid):
@@ -94,6 +98,7 @@ class Engine():
         except NoSuchNibbleIDException, e:
             raise e
         else:
+            self._logger.debug("Killing nibble '%s'" % nibbleid)
             nibble._energy = 0
             self._board.settoken(".", nibble._xpos, nibble._ypos)
             # if the current nibble was killed advance with next nibble
@@ -200,11 +205,17 @@ class Engine():
 
         # Place nibbles randomly on the board TODO
         for n in self._nibblelist:
-            x = self._random.randint(0, self._board.getwidth())
-            y = self._random.randint(0, self._board.getheight())
+            x, y = 0, 0
+            while True:
+                x = self._random.randint(0, self._board.getwidth())
+                y = self._random.randint(0, self._board.getheight())
+                if self._board.gettoken(x, y) == '.':
+                    break
             self._board.settoken(n, x, y)
             n.setPos(x, y)
 
+        # Signal changes
+        self.updatesignal.call()
         # Set first player
         self._currentnibbleid = self._nibblelist.current().getName()
         # Set status to running
@@ -233,6 +244,9 @@ class Engine():
         self._logger.debug(("Try to execute turn of '%c' in round %i." +
             " Current nibble is '%c'")
             % (nibbleid, self._currentround, self._currentnibbleid))
+        self._logger.debug("Full board in turn %i: %s"
+            % (self._currentround, self._board.tostring()))
+
         # Wrong player wanted to move
         if not nibbleid == self._currentnibbleid:
             return -1
@@ -250,8 +264,13 @@ class Engine():
         for (dx, dy) in deltas:
             self._nibblestep(nibble, dx, dy)
 
+        #Use up energy for move
+        energycosts = self._calcenergycosts(direction)
+        nibble.setEnergy(nibble.getEnergy() - energycosts)
+
         # 5.) set next player
         self._nextnibble()
+        self.updatesignal.call()
         return 0
 
     def _nibblestep(self, nibble, dx, dy):
@@ -261,13 +280,11 @@ class Engine():
                 nibble -- (Nibble) The current moving nibble
                 dx, dy -- (int) The directino offsets calculated
                           by engine._calcdirectionoffset()."""
+
+        #todo: nibble alive?
         (oldx, oldy) = nibble.getPos()
         newx = oldx + dx
         newy = oldy + dy
-
-        #Use up energy for move
-        energycosts = self._calcenergycosts(dx, dy)
-        nibble.setEnergy(nibble.getEnergy() - energycosts)
 
         #combat / food consumption
         token = self._board.gettoken(newx, newy)
@@ -293,6 +310,7 @@ class Engine():
         for nibble in self._nibblelist:
             for board in self._boardsaves:
                 self._cmp.send(nibble.getName(), board, 0, True)
+        self.updatesignal.call()
 
     def _calcdirectionoffset(self, number):
         """Takes a direction number between 0 and 24 to calculate the x and
@@ -319,7 +337,6 @@ class Engine():
             return((x, y),)
         # 'knight' like step
         elif abs(x * y) == 2:
-            # todo
             if abs(x) == 2:
                 return ((x / 2, 0), (x / 2, y))
             else:
@@ -328,15 +345,24 @@ class Engine():
         else:
             return ((x / 2, y / 2), (x / 2, y / 2))
 
-    def _calcenergycosts(self, dx, dy):
+    def _calcenergycosts(self, number):
         """Calculate the energy that the nibble has to spend to move to the
             field given by dx and dy.
             Argument:
-                dx -- (int) delta x
-                dy -- (int) delta y"""
-        dx = abs(dx)
-        dy = abs(dy)
-        return self._energycostlist[dy + dx * 3]
+                number - (int) between 0 and 24 which describes the direction.
+            Return:
+                energycosts -- (int) the energy costs as interger"""
+
+        if not 0 <= number <= 24:
+            msg = (("No such direction description: %d. Must "
+                  + "be between 0 and 24!") % number)
+            self._logger.warning(msg)
+            raise ValueError(msg)
+
+        (x, y) = (number % 5 - 2, number / 5 - 2)
+        x = abs(x)
+        y = abs(y)
+        return self._energycostlist[y + x * 3]
 
     def _fight(self, attacker, defender):
         """Simulates the fight between two nibbles. Kills the nibble
@@ -431,3 +457,26 @@ class Engine():
         if len(self._boardsaves) == 10:
             self._boardsaves.pop(0)
         self._boardsaves.append(self._board.tostring())
+
+
+class EngineSignal(object):
+    """Simple signal which calls a number of saved functions."""
+    def __init__(self):
+        self.listeners = []
+
+    def register(self, function):
+        """Register a function to the signal.
+            Arguments:
+                function --- (function object) the function to be registered"""
+        self.listeners.append(function)
+
+    def remove(self, function):
+        """Removes the gifen function from the signal.
+            Arguments:
+                function -- (function object) the function to be removed"""
+        self.listeners.remove(function)
+
+    def call(self):
+        """Calls all function safed in the signal."""
+        for f in self.listeners:
+            f()
