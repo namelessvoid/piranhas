@@ -2,10 +2,11 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 from logging import log
 
+
 class ServerGui(QtGui.QMainWindow):
     def __init__(self, engine):
         QtGui.QMainWindow.__init__(self)
-        self.ui = uic.loadUi("servergui.ui", self)
+        self.ui = uic.loadUi("./nibbles/gui/servergui.ui", self)
 
         for i in range(100):
             text = "Logger 08:08:2012 - INFO: Test logger" + str(i)

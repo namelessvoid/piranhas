@@ -85,7 +85,7 @@ color:yellow;
     </property>
     <property name="styleSheet">
      <string notr="true">#bg{
-background-image:url(./img/bg.png);
+background-image:url(./nibbles/gui/img/bg.png);
 height:100%;
 width:100%;
 border:1px solid #333;
@@ -181,8 +181,8 @@ color:yellow;
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:10px; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10px; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Lucida Grande';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QTreeWidget" name="treeWidget">
@@ -254,7 +254,7 @@ border:none;
     </property>
     <property name="styleSheet">
      <string notr="true">#title{
-background-image: url(./img/title.png);
+background-image: url(./nibbles/gui/img/title.png);
 width:150px;
 height:41px;
 }</string>
@@ -274,7 +274,7 @@ height:41px;
      <x>0</x>
      <y>0</y>
      <width>858</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">
