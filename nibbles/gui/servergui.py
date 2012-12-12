@@ -26,14 +26,19 @@ class ServerGui(QtGui.QMainWindow):
         self.board = self._engine.getboard()
         self.view = self.board.tostring()
 
+
+        self.boardsring = ''
         c=0
         for i in self.view:
             c+=1
-            self.ui.boardtest.insertPlainText(i)
+            self.boardsring += i
 
             if c == self.board._width:
-                self.ui.boardtest.append('')
+                self.boardsring+='\r\n'
                 c=0
+
+        self.ui.boardtest.setText(self.boardsring)
+        self.ui.boardtest.update()
 
 
     def gamestart(self):
