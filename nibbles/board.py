@@ -37,10 +37,12 @@ class Board(object):
         copys the value at (x,y) and pastes it at (newX,newY).
         Then the (x,y)-field is drawn empty.
         """
-        nextX, nextY = self.calcposition(newX, newY)
         x, y = self.calcposition(x, y)
-        self._field[nextY][nextX] = self._field[y][x]
-        self._field[y][x] = '.'
+        newX, newY = self.calcposition(newX, newY)
+        self._field[newY][newX] = self._field[y][x]
+        # If token was actually not moved
+        if (x, y) != (newX, newY):
+            self._field[y][x] = '.'
 
     def move(self, posX, posY, x, y):
         """
