@@ -26,16 +26,10 @@ class ServerGui(QtGui.QMainWindow):
         self.board = self._engine.getboard()
         self.view = self.board.tostring()
 
-
         self.boardsring = ''
-        c=0
-        for i in self.view:
-            c+=1
-            self.boardsring += i
-
-            if c == self.board._width:
-                self.boardsring+='\r\n'
-                c=0
+        for i in range(( len(self.view) / self.board._width )):
+            i *= self.board._width
+            self.boardsring += (self.view[i : self.board._width + i] + '\r\n')
 
         self.ui.boardtest.setText(self.boardsring)
         self.ui.boardtest.update()
