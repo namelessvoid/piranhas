@@ -107,12 +107,12 @@ class Engine(threading.Thread):
             "\D{1}@" : lambda param: self.startgame(),
             "\d+x\d+@" : lambda param: self.printmessage(param),
             "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}" : lambda param: self.printmessage(param), #do something
-            "(;|\d{1,2};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.handlemessage(param)
+            "(;|\d{1,4};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.handlemessage(param)
         }
 
         while self._gamerun:
             command = self.receivecommand()
-
+            time.sleep(0.2)
             if command:
                 self._logger.info(" Client Received command: %s" % command)
 
