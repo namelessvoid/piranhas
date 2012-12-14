@@ -36,7 +36,7 @@ class NetworkInterface(socket.socket):
         socketfile = self.makefile()
         socketfile.write(message)
         #logging.info("NetworkInterface.sendMessage() DONE")
-        socketfile.close()
+        #socketfile.close()
 
     def getmessage(self):
         if self._buffer:
