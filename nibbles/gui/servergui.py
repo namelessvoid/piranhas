@@ -4,10 +4,28 @@ from logging import log
 import datetime
 
 
+class BoardRenderer(QtGui.QWidget):
+
+    def __init__(self, parent = None):
+        QtGui.QWidget.__init__(self, parent)
+
+    def paintEvent(event):
+        painter = QtGui.QPainter(self)
+        pen = QtGui.QPen(QtGui.QColor(255,0,0))
+        painter.setPen(pen)
+
+        brush = QtGui.QBruh(QtGui.QColor(255,0,0))
+        painter.setBrush(brush)
+
+
+
+
 class ServerGui(QtGui.QMainWindow):
     def __init__(self, engine):
         QtGui.QMainWindow.__init__(self)
         self.ui = uic.loadUi("./nibbles/gui/servergui.ui", self)
+
+        self._boardrenderer = BoardRenderer()
 
         for i in range(100):
             text = "Logger 08:08:2012 - INFO: Test logger" + str(i)
