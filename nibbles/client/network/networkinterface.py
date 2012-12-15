@@ -6,23 +6,22 @@
     engine."""
 
 import socket
-import logging
 import thread
 from nibbles.nibblelogger import *
 
 class NetworkInterface(socket.socket):
     #_s, _host, _port = (None, None, None)
 
-    def __init__(self, host, port):
+    def __init__(self):
         """Initialize the NetworkInterface
         host:    string that holds the address of the host
         port:    integer that holds the destination port"""
         socket.socket.__init__(self, socket.AF_INET, socket.SOCK_STREAM)
         self._buffer = False
-        self._host = host
-        self._port = port
         self._logger = NibbleStreamLogger("client.networkinterface")
-        self.connect((self._host, self._port))
+
+    def connecttoserver(self, host, port):
+        self.connect((host, port))
         self._logger.info("NetworkInterface connected to %s:%d" % (host, port))
         try:
             self.receivemessageThread = thread.start_new_thread(self.receivemessage, ())
@@ -33,8 +32,9 @@ class NetworkInterface(socket.socket):
         """Sends a message to the host.
         message: string representation of the message."""
         self._logger.info("NetworkInterface.sendMessage(\"" + message + "\")")
-        socketfile = self.makefile()
-        socketfile.write(message)
+        #socketfile = self.makefile()
+        #socketfile.write(message)
+        self.sendall(message)
         #logging.info("NetworkInterface.sendMessage() DONE")
         #socketfile.close()
 
