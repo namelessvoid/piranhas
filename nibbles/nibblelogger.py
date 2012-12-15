@@ -36,6 +36,15 @@ class NibbleFileLogger(logging.FileHandler, NibbleLogger):
         logging.FileHandler.__init__(self, filename, filemode)
         NibbleLogger.__init__(self, logger, level)
 
+class NibbleQTextEditLogger(logging.Handler, NibbleLogger):
+    def __init__(self, text_edit, logger="default.default", level=logging.DEBUG):
+        logging.Handler.__init__(self)
+        NibbleLogger.__init__(self, logger, level)
+        self.text_edit = text_edit
+
+    def emit(self, record):
+        self.text_edit.append(self.format(record))
+
 if __name__ == "__main__":
     my_logger = NibbleStreamLogger()
     my_logger.info("Testnachricht")
