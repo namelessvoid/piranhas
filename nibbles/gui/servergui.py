@@ -11,7 +11,6 @@ class ServerGui(QtGui.QMainWindow):
         self.ui = uic.loadUi("./nibbles/gui/servergui.ui", self)
 
         self._boardrenderer = BoardRenderer()
-        self._boardrenderer.show()
 
         for i in range(100):
             text = "Logger 08:08:2012 - INFO: Test logger" + str(i)

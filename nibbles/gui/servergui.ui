@@ -311,7 +311,7 @@ height:41px;
   <customwidget>
    <class>BoardRenderer</class>
    <extends>QWidget</extends>
-   <header location="global">boardrenderer.py</header>
+   <header>boardrenderer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
