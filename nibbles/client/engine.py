@@ -47,13 +47,15 @@ class DummyClient(): #to be removed
 
 class Engine(threading.Thread):
 
-    def __init__(self, ni=None, board=None, ai=None):
+    def __init__(self, ni=None, renderer=None, ai=None):
         """Init the Engine"""
         threading.Thread.__init__(self)
         self._ni = ni
-        self._board = board
+        self._renderer = renderer
         self._ai = ai
         self._gamerun = True
+        self._currentview = ""
+        self._updatemethod = None
         self._logger = NibbleStreamLogger("client.engine")
 
     def receivecommand(self):
@@ -67,8 +69,12 @@ class Engine(threading.Thread):
         """Checks whether registration is possible on server"""
         self._ni.sendmessage("anmeldung moeglich@")
 
-    def connecttoserver(self):
+    def connecttoserver(self, host, port):
         """Connects to the Server"""
+        self._ni.connecttoserver(host, port)
+
+    def register(self):
+        """Register nibble"""
         self._ni.sendmessage("anmelden@")
 
     def getworldsize(self):
@@ -85,7 +91,23 @@ class Engine(threading.Thread):
 
     def renderboard(self, view, energy):
         """Renders the board"""
-        #BoardRenderer.renderboard(view, energy)
+        #self._renderer.renderboard(view, energy)
+
+    def stoploop(self):
+        """Stops the gameloop"""
+        self._gamerun = False
+
+    def getcurrentview(self):
+        """Returns the actual view of the nibble"""
+        return self._currentview
+
+    def registermethod(self, function):
+        """Register a function which will be called in the gameloop"""
+        self._updatemethod = function
+
+    def updategui(self):
+        if self._updatemethod != None:
+            self._updatemethod()
 
     def handlemessage(self, message):
         """Handles the message from the server"""
@@ -93,16 +115,17 @@ class Engine(threading.Thread):
         view = message.split(";")[1]
         field = message.split(";")[2]
         if view != "ende":
+            self._currentview = view
             self.sendcommand( str( self._ai.think(view, energy) )+"@" )
         else:
-            self._gamerun = False
+            self.stoploop()
 
     def run(self):
         """Commandprocessor for the engine:
            in functions dictionary are server messages mapped to a function"""
 
         functions = {
-            "ja@" : lambda param: self.connecttoserver(),
+            "ja@" : lambda param: self.register(),
             "nein@" : lambda param: self.printmessage("Anmeldung nicht moeglich"),
             "\D{1}@" : lambda param: self.startgame(),
             "\d+x\d+@" : lambda param: self.printmessage(param),
@@ -112,7 +135,7 @@ class Engine(threading.Thread):
 
         while self._gamerun:
             command = self.receivecommand()
-            time.sleep(0.2)
+            time.sleep(0.3)
             if command:
                 self._logger.info(" Client Received command: %s" % command)
 
@@ -124,6 +147,7 @@ class Engine(threading.Thread):
                         self.printmessage("fehler@\n")
                         break
 
+            self.updategui()
             time.sleep(0.4)
 
 if __name__== "__main__":
