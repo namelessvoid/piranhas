@@ -6,7 +6,7 @@ class BoardRenderer(QtGui.QWidget):
         QtGui.QWidget.__init__(self, parent)
         self.pen = QtGui.QPen(QtGui.QColor(0,0,0))
         self.pen.setWidth(3)
-        self.brush = QtGui.QBrush(QtGui.QColor(255,255,255))
+        self.brush = QtGui.QBrush(QtGui.QColor(255,255,255,50))
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)

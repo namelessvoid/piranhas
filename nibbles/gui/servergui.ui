@@ -251,6 +251,11 @@ border:none;
        <height>411</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">#widget{
+	background:transparent;
+}</string>
+     </property>
     </widget>
    </widget>
    <widget class="QLabel" name="title">
@@ -311,7 +316,7 @@ height:41px;
   <customwidget>
    <class>BoardRenderer</class>
    <extends>QWidget</extends>
-   <header>boardrenderer</header>
+   <header>./nibbles/gui/boardrenderer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
