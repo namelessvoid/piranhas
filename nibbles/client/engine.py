@@ -10,40 +10,6 @@ from nibbles.board import *
 from nibbles.client.ai import *
 from nibbles.client.network.networkinterface import *
 
-class DummyServer(threading.Thread): #to be removed
-    def __init__(self, host, port):
-        threading.Thread.__init__(self)
-        self._b = Board(10,10)
-        self._s = socket.socket()
-        self._s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._s.bind((host,port))
-        self._s.listen(1)
-        self.start()
-
-    def run(self):
-        c, (clienthost, clientport) = self._s.accept()
-        c.sendall("30;..*....*.>..A....<..*..*.;@")
-        data = c.recv(1024)
-        print("Vom Server: "+data+"\n")
-
-class DummyClient(): #to be removed
-    def __init__(self, host, port):
-        self._host = host
-        self._port = port
-        self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.verbinden()
-
-    def verbinden(self):
-        self._s.connect((self._host,self._port))
-
-    def receivemessage(self):
-        return self._s.recv(1024)
-
-    def sendmessage(self, message):
-        self._s.sendall(message)
-
-
-
 
 class Engine(threading.Thread):
 
@@ -108,6 +74,10 @@ class Engine(threading.Thread):
     def updategui(self):
         if self._updatemethod != None:
             self._updatemethod()
+
+    def initclientlogger(self, logger):
+        self._logger = NibbleQTextEditLogger(logger, "client.engine")
+        self._ni.setlogger(logger)
 
     def handlemessage(self, message):
         """Handles the message from the server"""
