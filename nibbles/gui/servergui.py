@@ -37,7 +37,7 @@ class ServerGui(QtGui.QMainWindow):
 #        self.ui.boardtest.setText(self.boardsring)
 #        self.ui.boardtest.update()
 
-        self.renderBoard()
+        self._boardrenderer.repaint()
 
 
     def gamestart(self):
@@ -48,8 +48,6 @@ class ServerGui(QtGui.QMainWindow):
         self._engine._endgame()
 
 
-    def renderBoard(self):
-        self._boardrenderer.repaint(self)
 
 
 
