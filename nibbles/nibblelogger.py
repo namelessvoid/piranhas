@@ -1,4 +1,5 @@
 import logging
+import threading
 
 class NibbleLogger(object):
     def __init__(self, logger="default.default", level=logging.DEBUG):
@@ -41,9 +42,12 @@ class NibbleQTextEditLogger(logging.Handler, NibbleLogger):
         logging.Handler.__init__(self)
         NibbleLogger.__init__(self, logger, level)
         self.text_edit = text_edit
+        self.logmessages = []
 
     def emit(self, record):
-        self.text_edit.append(self.format(record))
+        lock = threading.Lock()
+        with lock:
+            self.text_edit.append(self.format(record))
 
 if __name__ == "__main__":
     my_logger = NibbleStreamLogger()
