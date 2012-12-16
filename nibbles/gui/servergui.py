@@ -41,7 +41,7 @@ class ServerGui(QtGui.QMainWindow):
 
     def gamestart(self):
         self._engine.setgamestart(datetime.datetime.now())
-        self.ui.boardrenderer.setbboard(self._engine.getboard())
+        self.ui.boardrenderer.setboard(self._engine.getboard())
 
 
     def gamestop(self):
