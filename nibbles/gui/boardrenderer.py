@@ -29,8 +29,22 @@ class BoardRenderer(QtGui.QWidget):
             self.char_001.width(),
             self.char_001.height())
 
+        self._board = None
+
+    def setboard(self, board):
+        self._board = board
 
     def paintEvent(self, event):
+        if self._board is None:
+            self._renderempty()
+        # TODO
+        else:
+            self._render()
+
+    def _render(self):
+        self.renderempty()
+
+    def _renderempty(self):
         painter = QtGui.QPainter(self)
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
@@ -43,7 +57,6 @@ class BoardRenderer(QtGui.QWidget):
         for y in range(10):
             for x in range(16):
                 painter.drawRect((self.width*x), (self.height*y), 30 ,30)
-
 
         painter.drawImage(self.ziel1, self.char_001, self.quelle)
         painter.drawImage(self.ziel2, self.char_001active, self.quelle)
