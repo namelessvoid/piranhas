@@ -213,6 +213,9 @@ class Engine():
                     break
             self._board.settoken(n, x, y)
             n.setPos(x, y)
+            self._logger.debug(("Placed nibble at n.(%s/%s)."
+                + " Content of board: %s") % (n._xpos, n._ypos,
+                self._board.gettoken(n._xpos, n._ypos).getName()))
 
         # Signal changes
         self.updatesignal.call()
@@ -423,6 +426,7 @@ class Engine():
             if not nibble.isAlive():
                 self._logger.debug("in _nextnibble(): found dead nibble."
                     + " Continuing...")
+                self._currentnibbleid = nibble.getName()
                 self._sendtocmp()
             else:
                 break
@@ -447,8 +451,9 @@ class Engine():
         if nibble.isAlive():
             energy = nibble.getEnergy()
             (x, y) = nibble.getPos()
-            boardview = self._board.getnibbleview(x, y, energy)
-
+            boardview = self._board.getnibbleview(nibble, True)
+        self._logger.debug("Sending %s, %s, %s to cmp."
+            % (self._currentnibbleid, boardview, energy))
         self._cmp.send(self._currentnibbleid, boardview, energy)
 
     def _saveboard(self):
