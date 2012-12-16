@@ -188,10 +188,10 @@ p, li { white-space: pre-wrap; }
     <widget class="QTreeWidget" name="treeWidget">
      <property name="geometry">
       <rect>
-       <x>630</x>
+       <x>720</x>
        <y>100</y>
-       <width>211</width>
-       <height>192</height>
+       <width>121</width>
+       <height>261</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -245,10 +245,10 @@ border:none;
     <widget class="BoardRenderer" name="widget" native="true">
      <property name="geometry">
       <rect>
-       <x>70</x>
-       <y>40</y>
+       <x>190</x>
+       <y>120</y>
        <width>531</width>
-       <height>411</height>
+       <height>331</height>
       </rect>
      </property>
      <property name="styleSheet">
