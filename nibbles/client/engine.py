@@ -122,14 +122,10 @@ class Engine(threading.Thread):
 
 if __name__== "__main__":
 
-    #server = DummyServer('', 1234)
-    #client = DummyClient("localhost", 1234)
-    client = NetworkInterface("localhost", 1234)
-    board = Board(10,10)
+    client = NetworkInterface()
     ai = AI()
 
-    #ni = NetworkInterface("localhost", 1234)
-
-    engine = Engine(client, board, ai)
+    engine = Engine(client, None, ai)
+    engine.connecttoserver("localhost", 1234)
     engine.start()
     engine.sendcommand("anmeldung moeglich@")
