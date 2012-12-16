@@ -31,6 +31,8 @@ class ClientGui(QtGui.QMainWindow):
             self._ui.field.setText(boardstring)
             self._ui.field.update()
 
+#       self.ui.boardrenderer.renderboard(boardstring || view, 5) <- something like this?
+
     def gamestart(self):
         try:
             self._engine.connecttoserver(unicode(self._ui.ipInput.toPlainText()),
