@@ -66,7 +66,7 @@ class Board(object):
         newX, newY = self.calcposition(x, y)
         return self._field[newY][newX]
 
-    def getnibbleview(self, x, y, energy=None):
+    def getnibbleview(self, nibble, anonymised=False):
         """Returns a string which holds the 5x5 view of the nibble at pos x, y.
             Arguments:
                 x, y -- (int) The x and y coordinate of the nibble (center
@@ -78,14 +78,17 @@ class Board(object):
                         displayed as <, > or = relative to the energy.
             Return:
                 string which holds the view."""
+        x, y = nibble.getPos()
+        energy = nibble.getEnergy()
         view = ""
         for i in range(0, 5, 1):
             for j in range(0, 5, 1):
                 newI, newJ = self.calcposition(x + (j - 2), y + (i - 2))
                 element = self._field[newJ][newI]
                 if isinstance(element, Nibble):
-                    # if board is not anonymised or , print the nibble id
-                    if (energy is None) or (x == newI and y == newJ):
+                    # if board is not anonymised or the nibble in the middle
+                    # of the view is reached, print the nibble id
+                    if (anonymised is False) or (element == nibble):
                         element = element.getName()
                     # if the board is anonymised, just print <, > oder =
                     else:
@@ -123,13 +126,3 @@ class Board(object):
                     element = element.getName()
                 string += element
         return string
-
-
-class BoardRenderer(object):
-    def printboard(board):
-        for i in range(board._height):
-            for j in range(board._width):
-                sys.stdout.write(board._field[i][j] + " ",)
-            print
-
-    printboard = staticmethod(printboard)
