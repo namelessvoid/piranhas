@@ -29,8 +29,13 @@ class ServerGui(QtGui.QMainWindow):
         self.ui.stopgame.clicked.connect(self.gamestop)
 
 
+
     def update(self):
-        self.ui.boardrenderer.setboard(self._engine.getboard())
+        self.c = 0
+        if self.c == 0:
+            self.ui.boardrenderer.setboard(self._engine.getboard())
+            self.c+=1
+
         self.ui.boardrenderer.repaint()
 
 

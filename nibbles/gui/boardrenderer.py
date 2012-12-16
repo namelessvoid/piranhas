@@ -1,13 +1,6 @@
 import sys
 from PyQt4 import QtGui, QtCore
-
-
-class Test():
-    def __init__(self, engine):
-        self._engine = engine
-        self._board = self._engine.getboard()
-        print self._board.getwidth()
-        print self._board.getheight()
+import string
 
 
 class BoardRenderer(QtGui.QWidget):
@@ -42,7 +35,25 @@ class BoardRenderer(QtGui.QWidget):
             self._render()
 
     def _render(self):
-        self.renderempty()
+        painter = QtGui.QPainter(self)
+        painter.setPen(self.pen)
+        painter.setBrush(self.brush)
+
+        for y in range(self._board.getheight()):
+            for x in range(self._board.getwidth()):
+                if self._board._field[y][x] == '*':
+                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
+                    painter.drawImage(QtCore.QRect((self.width*x),(self.height*y),30,30), self.food, QtCore.QRect(0, 0,
+                        self.food.width(),
+                        self.food.height()))
+                elif self._board._field[y][x] == '.':
+                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
+                else:
+                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
+                    painter.drawImage(QtCore.QRect((self.width*x),(self.height*y),30,30), self.char_001, QtCore.QRect(0, 0,
+                        self.char_001.width(),
+                        self.char_001.height()))
+
 
     def _renderempty(self):
         painter = QtGui.QPainter(self)
@@ -58,9 +69,9 @@ class BoardRenderer(QtGui.QWidget):
             for x in range(16):
                 painter.drawRect((self.width*x), (self.height*y), 30 ,30)
 
-        painter.drawImage(self.ziel1, self.char_001, self.quelle)
-        painter.drawImage(self.ziel2, self.char_001active, self.quelle)
-        painter.drawImage(self.ziel3, self.food, self.quelle)
+#        painter.drawImage(self.ziel1, self.char_001, self.quelle)
+#        painter.drawImage(self.ziel2, self.char_001active, self.quelle)
+#        painter.drawImage(self.ziel3, self.food, self.quelle)
 
 
 
