@@ -2,6 +2,8 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 from logging import log
 import datetime
+
+import datetime
 from boardrenderer import BoardRenderer
 
 
@@ -25,6 +27,11 @@ class ServerGui(QtGui.QMainWindow):
         #stopgame_btn gui
         self.ui.stopgame.clicked.connect(self.gamestop)
 
+        #tmer for update of the lcd display
+        self.lcdtimer = QtCore.QTimer()
+        self.lcdtimer.timeout.connect(self.updatelcd)
+        self.lcdtimer.start(1000)
+
     def updategui(self):
         self.c = 0
         if self.c == 0:
@@ -40,3 +47,12 @@ class ServerGui(QtGui.QMainWindow):
 
     def gamestop(self):
         self._engine._endgame()
+
+    def updatelcd(self):
+        time = self._engine._gamestart - datetime.datetime.now()
+        h = time.seconds / 3600
+        m = (time.seconds % 3600) / 60
+        s = (time.seconds % 60)
+        text = "%02i:%02i:%02i" % (h, m, s)
+        self.ui.countdown.display(text)
+
