@@ -16,11 +16,8 @@ class ServerGui(QtGui.QMainWindow):
 
         self._engine = engine
 
-        #boardrenderer widget
-        #self._boardrenderer = BoardRenderer()
-
         #connect to the update pattern
-        self._engine.updatesignal.register(self.update)
+        self._engine.updatesignal.register(self.updategui)
 
         #startgame_btn gui
         self.ui.startgame.clicked.connect(self.gamestart)
@@ -28,21 +25,18 @@ class ServerGui(QtGui.QMainWindow):
         #stopgame_btn gui
         self.ui.stopgame.clicked.connect(self.gamestop)
 
-
-
-    def update(self):
+    def updategui(self):
         self.c = 0
         if self.c == 0:
             self.ui.boardrenderer.setboard(self._engine.getboard())
-            self.c+=1
+            self.c += 1
 
-        self.ui.boardrenderer.repaint()
-
+        self.ui.boardrenderer.update()
+        self.update()
 
     def gamestart(self):
         self._engine.setgamestart(datetime.datetime.now())
         self.ui.boardrenderer.setboard(self._engine.getboard())
-
 
     def gamestop(self):
         self._engine._endgame()
