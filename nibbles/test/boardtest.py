@@ -53,7 +53,14 @@ class TestBoard(unittest.TestCase):
         self.assertEqual("B........A....F............C.....D.....E", boardstr)
 
     def test_getnibbleview(self):
-        boardview = self.board.getnibbleview(7, 4)
+        nibble = Nibble('X', 30)
+        nibble.setPos(7, 4)
+        boardview = self.board.getnibbleview(nibble, False)
         self.assertEqual("............E.D...B..F..A", boardview)
-        boardview = self.board.getnibbleview(7, 4, 30)
+        boardview = self.board.getnibbleview(nibble, True)
         self.assertEqual("............E.>...=..F..<", boardview)
+
+    def test_fromstring(self):
+        boardstring = self.board.tostring()
+        self.board.fromstring(boardstring, 8)
+        self.assertEqual(boardstring, self.board.tostring())
