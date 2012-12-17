@@ -61,8 +61,9 @@ class TestBoard(unittest.TestCase):
         self.assertEqual("............E.>...=..F..<", boardview)
 
     def test_fromstring(self):
-        boardstring = self.board.tostring()
-        self.board.fromstring(boardstring, 8)
+        boardstring = "....a..f...*.d.."
+        #correct string building
+        self.board.fromstring(boardstring, 4)
         self.assertEqual(boardstring, self.board.tostring())
-
+        #broken string buidling
         self.assertEqual(self.board.fromstring(boardstring, 7), -1)
