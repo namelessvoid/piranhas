@@ -3,10 +3,7 @@ from PyQt4 import QtGui, QtCore, uic
 from logging import log
 import datetime
 
-import datetime
-from boardrenderer import BoardRenderer
-from PyQt4.QtCore import SIGNAL
-
+from nibbles.server.engine import RUNNING
 
 
 class ServerGui(QtGui.QMainWindow):
@@ -79,6 +76,9 @@ class ServerGui(QtGui.QMainWindow):
 
 
     def updatelcd(self):
+        if self._engine.getgamestatus() == RUNNING:
+            self.ui.countdown.display("start")
+            return 0
         time = self._engine._gamestart - datetime.datetime.now()
         h = time.seconds / 3600
         m = (time.seconds % 3600) / 60

@@ -336,7 +336,7 @@ class Engine():
 
         # break up double steps into single steps
         # if it's just a single step
-        if abs(max(x, y)) == 1:
+        if max(abs(x), abs(y)) == 1:
             return((x, y),)
         # 'knight' like step
         elif abs(x * y) == 2:
