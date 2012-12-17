@@ -127,28 +127,17 @@ class Board(object):
                 string += element
         return string
 
-    def fromstring(self, string, width):
-        """Converts a string to elements on a board instance.
-            Arguments:
-                string -- (string) the string representation of the board
-                width -- (int) the width of the board"""
-        # if string doesn't match the size of the board
-        if (len(string) % width) != 0:
-            return -1
-        self._width = width
-        self._height = len(string) / width
-        self.reset()
-        for x in range(width):
-            for y in range(len(string) / width):
-                self._field[y][x] = string[x + y * width]
-
-
-def boardfromstring(field, width, height):
-    """Returns a new board which was created from parameters"""
-    board = Board(width, height)
-    for i in range(( len(field) / width )):
-        i *= width
-        board._field[i/width] = [j for j in field[i : width + i]]
+def createfromstring(string, width):
+    """Converts a string to a board instance.
+        Arguments:
+            string -- (string) the string representation of the board
+            width -- (int) the width of the board"""
+    # if string doesn't match the size of the board
+    if (len(string) % width) != 0:
+        return -1
+    board = Board(width, len(string) / width)
+    board.reset()
+    for x in range(width):
+        for y in range(len(string) / width):
+            board._field[y][x] = string[x + y * width]
     return board
-
-

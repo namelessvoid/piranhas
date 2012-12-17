@@ -63,7 +63,8 @@ class TestBoard(unittest.TestCase):
     def test_fromstring(self):
         boardstring = "....a..f...*.d.."
         #correct string building
-        self.board.fromstring(boardstring, 4)
-        self.assertEqual(boardstring, self.board.tostring())
+        board = fromstring(boardstring, 4)
+        self.assertEqual(boardstring, board.tostring())
         #broken string buidling
-        self.assertEqual(self.board.fromstring(boardstring, 7), -1)
+        board = fromstring(boardstring, 7)
+        self.assertEqual(board, -1)
