@@ -46,6 +46,7 @@ class ServerGui(QtGui.QMainWindow):
             self.ui.boardrenderer.setboard(self._engine.getboard())
             self.c += 1
 
+        self.ui.countdown.update()
         self.ui.boardrenderer.update()
         self.update()
 
@@ -79,7 +80,8 @@ class ServerGui(QtGui.QMainWindow):
 
     def updatelcd(self):
         if self._engine.getgamestatus() == RUNNING:
-            self.ui.countdown.display("start")
+            self.ui.countdown.display(self._engine._currentround)
+            self.ui.countdownlabel.setText("Round:")
             return 0
         time = self._engine._gamestart - datetime.datetime.now()
         h = time.seconds / 3600

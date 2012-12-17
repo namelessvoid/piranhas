@@ -46,7 +46,7 @@ background-color:#333;
    <widget class="QLCDNumber" name="countdown">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>740</x>
       <y>0</y>
       <width>111</width>
       <height>31</height>
@@ -281,12 +281,12 @@ height:41px;
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="countdownlabel">
     <property name="geometry">
      <rect>
-      <x>660</x>
+      <x>640</x>
       <y>0</y>
-      <width>71</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
@@ -300,7 +300,7 @@ height:41px;
    <zorder>bg</zorder>
    <zorder>countdown</zorder>
    <zorder>title</zorder>
-   <zorder>label</zorder>
+   <zorder>countdownlabel</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
