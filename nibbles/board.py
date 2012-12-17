@@ -138,3 +138,14 @@ class Board(object):
         for x in range(width):
             for y in range(len(string) / width):
                 self._field[y][x] = string[x + y * width]
+
+
+def boardfromstring(field, width, height):
+    """Returns a new board which was created from parameters"""
+    board = Board(width, height)
+    for i in range(( len(field) / width )):
+        i *= width
+        board._field[i/width] = [j for j in field[i : width + i]]
+    return board
+
+
