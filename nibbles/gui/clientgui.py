@@ -23,7 +23,19 @@ class ClientGui(QtGui.QMainWindow):
         self._ui.stopgame.clicked.connect(self.gamestop)
 
     def updategui(self):
-        self._ui.boardrenderer.setboard(boardfromstring(self._engine.getcurrentview(), 5, 5))
+#        view = self._engine.getcurrentview()
+#        if view:
+#            boardstring = ''
+#            for i in range(( len(view) / self._viewwidth )):
+#                i *= self._viewwidth
+#                boardstring += (view[i : self._viewwidth + i] + '\r\n')
+#
+#            self._ui.field.setText(boardstring)
+#            self._ui.field.update()
+
+        board = createfromstring(self._engine.getcurrentview(), 5)
+        self._ui.boardrenderer.setboard(board)
+
         self._ui.boardrenderer.update()
         self.update()
 
