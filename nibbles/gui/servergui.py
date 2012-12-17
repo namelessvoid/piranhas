@@ -1,12 +1,7 @@
-import sys
 from PyQt4 import QtGui, QtCore, uic
-from logging import log
 import datetime
 
-import datetime
-from boardrenderer import BoardRenderer
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QMessageBox
+from nibbles.server.engine import RUNNING
 
 
 class ServerGui(QtGui.QMainWindow):
@@ -20,8 +15,8 @@ class ServerGui(QtGui.QMainWindow):
 
         self._engine = engine
 
-
-        self.dialog = QMessageBox()
+        #create about dialog
+        self.dialog = QtGui.QMessageBox()
         self.dialog.setText("Hallo")
 
         #connect about
@@ -50,21 +45,20 @@ class ServerGui(QtGui.QMainWindow):
         self.ui.boardrenderer.update()
         self.update()
 
-
     def gamestart(self):
         self._engine.setgamestart(datetime.datetime.now())
         self.ui.boardrenderer.setboard(self._engine.getboard())
 
-
     def gamestop(self):
         self._engine._endgame()
-
 
     def aboutdialog(self):
         self.dialog.show()
 
-
     def updatelcd(self):
+        if self._engine.getgamestatus() == RUNNING:
+            self.ui.countdown.display("start")
+            return 0
         time = self._engine._gamestart - datetime.datetime.now()
         h = time.seconds / 3600
         m = (time.seconds % 3600) / 60
