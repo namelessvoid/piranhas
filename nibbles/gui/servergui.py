@@ -2,7 +2,8 @@ import sys
 from PyQt4 import QtGui, QtCore, uic
 from logging import log
 import datetime
-from boardrenderer import BoardRenderer
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtGui import QMessageBox
 
 
 class ServerGui(QtGui.QMainWindow):
@@ -16,8 +17,13 @@ class ServerGui(QtGui.QMainWindow):
 
         self._engine = engine
 
-        #boardrenderer widget
-        #self._boardrenderer = BoardRenderer()
+
+
+        #QMessage - about
+        self.dialog = QtGui.QMessageBox("test", "test")
+
+        #open about
+        self.ui.about.activated.connect(self.aboutdialog)
 
         #connect to the update pattern
         self._engine.updatesignal.register(self.update)
@@ -27,7 +33,6 @@ class ServerGui(QtGui.QMainWindow):
 
         #stopgame_btn gui
         self.ui.stopgame.clicked.connect(self.gamestop)
-
 
 
     def update(self):
@@ -46,3 +51,7 @@ class ServerGui(QtGui.QMainWindow):
 
     def gamestop(self):
         self._engine._endgame()
+
+
+    def aboutdialog(self):
+        self.dialog.show()
