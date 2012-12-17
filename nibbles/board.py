@@ -135,6 +135,9 @@ class Board(object):
         # if string doesn't match the size of the board
         if (len(string) % width) != 0:
             return -1
+        self._width = width
+        self._height = len(string) / width
+        self.reset()
         for x in range(width):
             for y in range(len(string) / width):
                 self._field[y][x] = string[x + y * width]
