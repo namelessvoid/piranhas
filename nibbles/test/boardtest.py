@@ -64,3 +64,5 @@ class TestBoard(unittest.TestCase):
         boardstring = self.board.tostring()
         self.board.fromstring(boardstring, 8)
         self.assertEqual(boardstring, self.board.tostring())
+
+        self.assertEqual(self.board.fromstring(boardstring, 7), -1)
