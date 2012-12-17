@@ -21,11 +21,10 @@ class ServerGui(QtGui.QMainWindow):
         self._engine = engine
 
 
+        self.dialog = QMessageBox()
+        self.dialog.setText("Hallo")
 
-        #QMessage - about
-        self.dialog = QtGui.QMessageBox("test", "test")
-
-        #open about
+        #connect about
         self.ui.about.activated.connect(self.aboutdialog)
 
         #connect to the update pattern
@@ -63,6 +62,8 @@ class ServerGui(QtGui.QMainWindow):
 
     def aboutdialog(self):
         self.dialog.show()
+
+
     def updatelcd(self):
         time = self._engine._gamestart - datetime.datetime.now()
         h = time.seconds / 3600
