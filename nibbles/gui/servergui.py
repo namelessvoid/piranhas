@@ -6,7 +6,7 @@ import datetime
 import datetime
 from boardrenderer import BoardRenderer
 from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QMessageBox
+
 
 
 class ServerGui(QtGui.QMainWindow):
@@ -21,8 +21,8 @@ class ServerGui(QtGui.QMainWindow):
         self._engine = engine
 
 
-        self.dialog = QMessageBox()
-        self.dialog.setText("Hallo")
+        #createaboutdialog
+        self.createaboutdialog()
 
         #connect about
         self.ui.about.activated.connect(self.aboutdialog)
@@ -58,6 +58,20 @@ class ServerGui(QtGui.QMainWindow):
 
     def gamestop(self):
         self._engine._endgame()
+
+
+    def createaboutdialog(self):
+        self.dialog = QtGui.QMessageBox()
+        self.dialog.setWindowTitle("About - The Piranhas")
+        self.dialog.setIconPixmap(QtGui.QPixmap("./nibbles/gui/img/title.png"))
+        self.dialogtext = """About <hr/>
+                            <p>Simon Kerler<br/>
+                            Manuel Oswald<br/>
+                            Benjamin Woehrl<br/>
+                            Patrick Link<br/>
+                            Christian Schmied</p>"""
+
+        self.dialog.setText(self.dialogtext)
 
 
     def aboutdialog(self):
