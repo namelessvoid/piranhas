@@ -126,3 +126,12 @@ class Board(object):
                     element = element.getName()
                 string += element
         return string
+
+
+def boardfromstring(field, width, height):
+    """Returns a new board which was created from parameters"""
+    board = Board(width, height)
+    for i in range(( len(field) / width )):
+        i *= width
+        board._field[i/width] = [j for j in field[i : width + i]]
+    return board
