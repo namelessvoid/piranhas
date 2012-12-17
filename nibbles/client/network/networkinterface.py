@@ -46,9 +46,6 @@ class NetworkInterface(socket.socket):
         else:
             return False
 
-    def setlogger(self, logger):
-        self._logger = NibbleQTextEditLogger(logger, "client.networkinterface")
-
     def receivemessage(self):
         """Receives a message from the host.
         return value: String which holds the message"""
