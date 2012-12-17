@@ -22,6 +22,10 @@ class BoardRenderer(QtGui.QWidget):
             self.char_001.width(),
             self.char_001.height())
 
+        #dimensions of a rectangle that's rendered on the board
+        self.rectwidth = 33
+        self.rectheight = 33
+
         self._board = None
 
     def setboard(self, board):
@@ -42,15 +46,15 @@ class BoardRenderer(QtGui.QWidget):
         for y in range(self._board.getheight()):
             for x in range(self._board.getwidth()):
                 if self._board._field[y][x] == '*':
-                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
-                    painter.drawImage(QtCore.QRect((self.width*x),(self.height*y),30,30), self.food, QtCore.QRect(0, 0,
+                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
+                    painter.drawImage(QtCore.QRect((self.rectwidth*x),(self.rectheight*y),30,30), self.food, QtCore.QRect(0, 0,
                         self.food.width(),
                         self.food.height()))
                 elif self._board._field[y][x] == '.':
-                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
+                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
                 else:
-                    painter.drawRect((self.width*x), (self.height*y), 30 ,30)
-                    painter.drawImage(QtCore.QRect((self.width*x),(self.height*y),30,30), self.char_001, QtCore.QRect(0, 0,
+                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
+                    painter.drawImage(QtCore.QRect((self.rectwidth*x),(self.rectheight*y),30,30), self.char_001, QtCore.QRect(0, 0,
                         self.char_001.width(),
                         self.char_001.height()))
 
@@ -60,14 +64,10 @@ class BoardRenderer(QtGui.QWidget):
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
 
-        #dimensions of a rectangle
-        self.width = 33
-        self.height = 33
-
         #range in rectangles
         for y in range(10):
             for x in range(16):
-                painter.drawRect((self.width*x), (self.height*y), 30 ,30)
+                painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
 
 #        painter.drawImage(self.ziel1, self.char_001, self.quelle)
 #        painter.drawImage(self.ziel2, self.char_001active, self.quelle)
