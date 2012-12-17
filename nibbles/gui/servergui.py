@@ -17,6 +17,8 @@ class ServerGui(QtGui.QMainWindow):
 
         self._engine = engine
 
+        #set window icon
+        self.setWindowIcon(QtGui.QIcon('./nibbles/gui/img/logo_small.png'))
 
         #createaboutdialog
         self.createaboutdialog()
