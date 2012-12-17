@@ -60,11 +60,11 @@ class TestBoard(unittest.TestCase):
         boardview = self.board.getnibbleview(nibble, True)
         self.assertEqual("............E.>...=..F..<", boardview)
 
-    def test_fromstring(self):
+    def test_createfromstring(self):
         boardstring = "....a..f...*.d.."
         #correct string building
-        board = fromstring(boardstring, 4)
+        board = createfromstring(boardstring, 4, 4)
         self.assertEqual(boardstring, board.tostring())
         #broken string buidling
-        board = fromstring(boardstring, 7)
+        board = createfromstring(boardstring, 7, 7)
         self.assertEqual(board, -1)
