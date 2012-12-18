@@ -4,7 +4,7 @@ from nibbles.nibblelogger import *
 from nibbles.board import *
 
 class ClientGui(QtGui.QMainWindow):
-    logginsignal = QtCore.pyqtSignal(str)
+    loggingsignal = QtCore.pyqtSignal(str)
 
     def __init__(self, engine):
         QtGui.QMainWindow.__init__(self)
@@ -14,11 +14,11 @@ class ClientGui(QtGui.QMainWindow):
         self._logger = NibbleStreamLogger("gui.clientgui")
 
         #register logging text box to the engine logger.
-        self._engine._logger.logsignal.register(self.receivelogmessage)
-        self._engine._ni._logger.logsignal.register(self.receivelogmessage)
-        self._logger.logsignal.register(self.receivelogmessage)
+        self._engine._logger.logsignal.register(self.loggingsignal.emit)
+        self._engine._ni._logger.logsignal.register(self.loggingsignal.emit)
+        self._logger.logsignal.register(self.loggingsignal.emit)
         self._ui.logger.setText("Logger")
-        self.logginsignal.connect(self._ui.logger.logslot)
+        self.loggingsignal.connect(self._ui.logger.logslot)
 
         #register the update method for gui
         self._engine.registermethod(self.updategui)
@@ -69,15 +69,3 @@ class ClientGui(QtGui.QMainWindow):
 
     def gamestop(self):
         self._engine.stoploop()
-
-    def receivelogmessage(self, string):
-        self.logginsignal.emit(string)
-
-
-
-
-
-
-
-
-
