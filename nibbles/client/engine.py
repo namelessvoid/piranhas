@@ -79,10 +79,6 @@ class Engine(threading.Thread):
         if self._updatemethod != None:
             self._updatemethod()
 
-    def initclientlogger(self, logger):
-        self._logger = NibbleQTextEditLogger(logger, "client.engine")
-        self._ni.setlogger(logger)
-
     def handlemessage(self, message):
         """Handles the message from the server"""
         energy = message.split(";")[0]
