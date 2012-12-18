@@ -13,14 +13,14 @@ from nibbles.client.network.networkinterface import *
 
 class Engine(threading.Thread):
 
-    def __init__(self, ni=None, renderer=None, ai=None):
+    def __init__(self, ni=None, ai=None):
         """Init the Engine"""
         threading.Thread.__init__(self)
         self._ni = ni
-        self._renderer = renderer
+        self._currentboard = None
+        self._currentenergy = None
         self._ai = ai
         self._gamerun = True
-        self._currentview = ""
         self._updatemethod = None
         self._logger = NibbleStreamLogger("client.engine")
 
@@ -63,9 +63,13 @@ class Engine(threading.Thread):
         """Stops the gameloop"""
         self._gamerun = False
 
-    def getcurrentview(self):
+    def getcurrentboard(self):
         """Returns the actual view of the nibble"""
-        return self._currentview
+        return self._currentboard
+
+    def getcurrentenergy(self):
+        """Returns the actual view of the nibble"""
+        return self._currentenergy
 
     def registermethod(self, function):
         """Register a function which will be called in the gameloop"""
@@ -84,8 +88,9 @@ class Engine(threading.Thread):
         energy = message.split(";")[0]
         view = message.split(";")[1]
         field = message.split(";")[2]
+        self._currentenergy = energy
         if view != "ende" and int(energy) > 0:
-            self._currentview = view
+            self._currentboard = createfromstring(view, 5, 5)
             self.sendcommand( str( self._ai.think(view, energy) )+"@" )
         else:
             self.stoploop()
@@ -115,6 +120,7 @@ class Engine(threading.Thread):
                         break
                     elif i == len(functions) - 1:
                         self.printmessage("fehler@\n")
+                        self._logger.warning(" Unknown command: %s" % command)
                         break
 
             self.updategui()
