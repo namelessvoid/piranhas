@@ -84,7 +84,7 @@ class Engine(threading.Thread):
         energy = message.split(";")[0]
         view = message.split(";")[1]
         field = message.split(";")[2]
-        if view != "ende":
+        if view != "ende" and int(energy) > 0:
             self._currentview = view
             self.sendcommand( str( self._ai.think(view, energy) )+"@" )
         else:
