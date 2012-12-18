@@ -7,7 +7,7 @@ from nibbles.gui.clientgui import ClientGui
 
 ai = AI()
 ni = NetworkInterface()
-engine = Engine(ni, None, ai)
+engine = Engine(ni, ai)
 app = QtGui.QApplication(sys.argv)
 clientgui = ClientGui(engine)
 clientgui.show()

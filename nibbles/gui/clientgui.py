@@ -26,7 +26,7 @@ class ClientGui(QtGui.QMainWindow):
         self.createinputdialog()
 
     def updategui(self):
-        self._ui.boardrenderer.setboard(createfromstring(self._engine.getcurrentview(), 5, 5))
+        self._ui.boardrenderer.setboard(self._engine.getcurrentboard())
         self._ui.boardrenderer.update()
         self.update()
 
