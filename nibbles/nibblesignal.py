@@ -19,6 +19,18 @@ class NibbleSignal(object):
         self.listeners.remove(function)
 
     def call(self):
-        """Calls all function safed in the signal."""
+        """Calls all function saved in the signal."""
         for f in self.listeners:
             f()
+
+
+class NibbleStringSignal(NibbleSignal):
+    def __init__(self):
+        super(NibbleStringSignal, self).__init__()
+
+    def callstr(self, string):
+        """Calls all function saved in the signal and send 'string' to them.
+            Argumetns:
+                string -- (string) a string that is send to all listeners."""
+        for f in self.listeners:
+            f(string)
