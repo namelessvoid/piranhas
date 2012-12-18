@@ -17,10 +17,13 @@ class ClientGui(QtGui.QMainWindow):
         self._engine.initclientlogger(self._ui.logger)
 
         #startgame_btn gui
-        self._ui.startgame.clicked.connect(self.gamestart)
+        self._ui.startgame.clicked.connect(self.showdialog)
 
         #stopgame_btn gui
         self._ui.stopgame.clicked.connect(self.gamestop)
+
+        #create input dialog
+        self.createinputdialog()
 
     def updategui(self):
         self._ui.boardrenderer.setboard(createfromstring(self._engine.getcurrentview(), 5, 5))
@@ -29,17 +32,33 @@ class ClientGui(QtGui.QMainWindow):
 
     def gamestart(self):
         try:
-            host, okhost = QtGui.QInputDialog.getText(self, "Host Settings", "Host:")
-            if not okhost: return
-            port, okport = QtGui.QInputDialog.getInt(self, "Port Settings", "Port:")
-            if not okport: return
-            self._logger.info("Host: %s" % host)
-            self._logger.info("Port: %d" % port)
+            QtGui.QMessageBox.close(self._dialog)
+            host = self._hostinput.text()
+            port = int(self._portinput.text())
             self._engine.connecttoserver(host, port)
             self._engine.start()
             self._engine.sendcommand("anmeldung moeglich@")
         except:
             self._logger.warning("Cant connect to the server!")
+
+    def createinputdialog(self):
+        """Creates a dialog for host and port settings"""
+        self._dialog = QtGui.QDialog()
+        self._dialog.setWindowTitle("Settings")
+        but = QtGui.QPushButton("OK")
+        self._hostinput = QtGui.QLineEdit()
+        self._portinput = QtGui.QLineEdit()
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(QtGui.QLabel("Host:"))
+        layout.addWidget(self._hostinput)
+        layout.addWidget(QtGui.QLabel("Port:"))
+        layout.addWidget(self._portinput)
+        layout.addWidget(but)
+        self._dialog.setLayout(layout)
+        self._dialog.connect(but, QtCore.SIGNAL("clicked()"), self.gamestart)
+
+    def showdialog(self):
+        self._dialog.show()
 
     def gamestop(self):
         self._engine.stoploop()
