@@ -144,7 +144,7 @@ color:#fff;
       <string>Start Game</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="logger">
+    <widget class="QtLogger" name="logger">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -338,6 +338,11 @@ height:41px;
    <extends>QWidget</extends>
    <header>./nibbles/gui/boardrenderer</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtLogger</class>
+   <extends>QTextEdit</extends>
+   <header>./nibbles/gui/qtlogger</header>
   </customwidget>
  </customwidgets>
  <resources/>

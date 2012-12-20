@@ -7,13 +7,12 @@ from nibbles.server.engine import RUNNING
 
 
 class ServerGui(QtGui.QMainWindow):
+    loggingsignal = QtCore.pyqtSignal(str)
+
     def __init__(self, engine):
         QtGui.QMainWindow.__init__(self)
         self.ui = uic.loadUi("./nibbles/gui/servergui.ui", self)
-
-        for i in range(100):
-            text = "Logger 08:08:2012 - INFO: Test logger" + str(i)
-            self.ui.logger.append(text.rstrip())
+        self.ui.logger.setText("Logger")
 
         self._engine = engine
 
@@ -35,10 +34,21 @@ class ServerGui(QtGui.QMainWindow):
         #stopgame_btn gui
         self.ui.stopgame.clicked.connect(self.gamestop)
 
-        #tmer for update of the lcd display
+        #timer for update of the lcd display
         self.lcdtimer = QtCore.QTimer()
         self.lcdtimer.timeout.connect(self.updatelcd)
         self.lcdtimer.start(1000)
+
+        #register loggers
+        self._registerloggers()
+
+    def _registerloggers(self):
+        """Called by __init__() and initializes the loggers."""
+        self._engine._logger.logsignal.register(self.loggingsignal.emit)
+        comp = self._engine._cmp
+        comp._logger.logsignal.register(self.loggingsignal.emit)
+        comp.server._logger.logsignal.register(self.loggingsignal.emit)
+        self.loggingsignal.connect(self.ui.logger.logslot)
 
     def updategui(self):
         self.c = 0
