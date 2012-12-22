@@ -78,8 +78,8 @@ class Board(object):
                         displayed as <, > or = relative to the energy.
             Return:
                 string which holds the view."""
-        x, y = nibble.getPos()
-        energy = nibble.getEnergy()
+        x, y = nibble.getpos()
+        energy = nibble.getenergy()
         view = ""
         for i in range(0, 5, 1):
             for j in range(0, 5, 1):
@@ -89,12 +89,12 @@ class Board(object):
                     # if board is not anonymised or the nibble in the middle
                     # of the view is reached, print the nibble id
                     if (anonymised is False) or (element == nibble):
-                        element = element.getName()
+                        element = element.getname()
                     # if the board is anonymised, just print <, > oder =
                     else:
-                        if element.getEnergy() > energy:
+                        if element.getenergy() > energy:
                             element = ">"
-                        elif element.getEnergy() < energy:
+                        elif element.getenergy() < energy:
                             element = "<"
                         else:
                             element = "="
@@ -123,7 +123,7 @@ class Board(object):
                 self._logger.debug("Try to access [%i][%i]" % (i, j))
                 element = self._field[i][j]
                 if isinstance(element, Nibble):
-                    element = element.getName()
+                    element = element.getname()
                 string += element
         return string
 

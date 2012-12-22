@@ -104,7 +104,7 @@ class Engine():
             self._board.settoken(".", nibble._xpos, nibble._ypos)
             # if the current nibble was killed advance with next nibble
 #            if self._nibblelist.current() == nibble:
-#                self._currentnibbleid = self._nibblelist.next().getName()
+#                self._currentnibbleid = self._nibblelist.next().getname()
 
     def getnibblebyid(self, nibbleid):
         """Returns a reference to the nibble with nibbleid.
@@ -116,7 +116,7 @@ class Engine():
                 NoSuchNibbleIDException"""
         searchednibble = None
         for nibble in self._nibblelist:
-            if nibble.getName() == nibbleid:
+            if nibble.getname() == nibbleid:
                 searchednibble = nibble
                 break
         if not searchednibble:
@@ -213,15 +213,15 @@ class Engine():
                 if self._board.gettoken(x, y) == '.':
                     break
             self._board.settoken(n, x, y)
-            n.setPos(x, y)
+            n.setpos(x, y)
             self._logger.debug(("Placed nibble at n.(%s/%s)."
                 + " Content of board: %s") % (n._xpos, n._ypos,
-                self._board.gettoken(n._xpos, n._ypos).getName()))
+                self._board.gettoken(n._xpos, n._ypos).getname()))
 
         # Signal changes
         self.updatesignal.call()
         # Set first player
-        self._currentnibbleid = self._nibblelist.current().getName()
+        self._currentnibbleid = self._nibblelist.current().getname()
         # Set status to running
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
@@ -270,7 +270,7 @@ class Engine():
 
         #Use up energy for move
         energycosts = self._calcenergycosts(direction)
-        nibble.setEnergy(nibble.getEnergy() - energycosts)
+        nibble.setenergy(nibble.getenergy() - energycosts)
 
         # 5.) set next player
         self._nextnibble()
@@ -286,7 +286,7 @@ class Engine():
                           by engine._calcdirectionoffset()."""
 
         #todo: nibble alive?
-        (oldx, oldy) = nibble.getPos()
+        (oldx, oldy) = nibble.getpos()
         newx = oldx + dx
         newy = oldy + dy
 
@@ -295,12 +295,12 @@ class Engine():
         if token in self._nibblelist and token != nibble:
             self._fight(nibble, token)
         elif token == "*":
-            nibble.setEnergy(nibble.getEnergy() + self._energyperfood)
+            nibble.setenergy(nibble.getenergy() + self._energyperfood)
 
         # if not killed, move the nibble
-        if nibble.isAlive():
+        if nibble.isalive():
             self._board.movetoken(oldx, oldy, newx, newy)
-            nibble.setPos(newx, newy)
+            nibble.setpos(newx, newy)
         # if killed, remove nibble from the board
         else:
             self._board.settoken('.', oldx, oldy)
@@ -313,7 +313,7 @@ class Engine():
         # Send past 10 boards to clients
         for nibble in self._nibblelist:
             for board in self._boardsaves:
-                self._cmp.send(nibble.getName(), board, 0, True)
+                self._cmp.send(nibble.getname(), board, 0, True)
         self.updatesignal.call()
 
     def _calcdirectionoffset(self, number):
@@ -375,19 +375,19 @@ class Engine():
                 attacker -- (nibble) the attacking nibble
                 defender -- (nibble) the defending nibble"""
         self._logger.debug("Nibble fight: attacker %s vs. %s defender" %
-                (attacker.getName(), defender.getName()))
+                (attacker.getname(), defender.getname()))
 
-        if defender.getEnergy() > attacker.getEnergy():
+        if defender.getenergy() > attacker.getenergy():
             self._logger.debug("Nibble fight: Winner is defender %s." %
-                    defender.getName())
-            defender.setEnergy(defender.getEnergy() + attacker.getEnergy())
-            self.killnibble(attacker.getName())
+                    defender.getname())
+            defender.setenergy(defender.getenergy() + attacker.getenergy())
+            self.killnibble(attacker.getname())
 
         else:
             self._logger.debug("Nibble fight: Winner is attacker %s." %
-                    attacker.getName())
-            attacker.setEnergy(defender.getEnergy() + attacker.getEnergy())
-            self.killnibble(defender.getName())
+                    attacker.getname())
+            attacker.setenergy(defender.getenergy() + attacker.getenergy())
+            self.killnibble(defender.getname())
 
     def _dropfood(self):
         """Place food on the baord randomly. The amount of food dropped is
@@ -399,7 +399,7 @@ class Engine():
             # if a nibble is on the chosen location, feed it
             token = self._board.gettoken(rx, ry)
             if isinstance(token, Nibble):
-                token.setEnergy(token.getEnergy() + self._energyperfood)
+                token.setenergy(token.getenergy() + self._energyperfood)
             else:
                 self._board.settoken("*", rx, ry)
 
@@ -424,18 +424,18 @@ class Engine():
                 self._dropfood()
 
             # if nibble is dead, continue with loop
-            if not nibble.isAlive():
+            if not nibble.isalive():
                 self._logger.debug("in _nextnibble(): found dead nibble."
                     + " Continuing...")
-                self._currentnibbleid = nibble.getName()
+                self._currentnibbleid = nibble.getname()
                 self._sendtocmp()
             else:
                 break
 
         self._logger.debug("_nextnibble: previous nibble '%c', new nibble '%c'"
-            % (self._currentnibbleid, nibble.getName()))
+            % (self._currentnibbleid, nibble.getname()))
 
-        self._currentnibbleid = nibble.getName()
+        self._currentnibbleid = nibble.getname()
         self._timer = threading.Timer(self._turntimeout, self.execturn,
             args=[self._currentnibbleid, 12])
         self._timer.start()
@@ -449,9 +449,9 @@ class Engine():
         nibble = self.getnibblebyid(self._currentnibbleid)
         energy = 0
         boardview = ""
-        if nibble.isAlive():
-            energy = nibble.getEnergy()
-            (x, y) = nibble.getPos()
+        if nibble.isalive():
+            energy = nibble.getenergy()
+            (x, y) = nibble.getpos()
             boardview = self._board.getnibbleview(nibble, True)
         self._logger.debug("Sending %s, %s, %s to cmp."
             % (self._currentnibbleid, boardview, energy))

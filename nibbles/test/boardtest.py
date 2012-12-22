@@ -17,24 +17,24 @@ class TestBoard(unittest.TestCase):
         self.board._logger.setLevel(logging.WARNING)
 
     def test_gettoken(self):
-        self.assertEqual("A", self.board.gettoken(1, 1).getName())
-        self.assertEqual("B", self.board.gettoken(0, 0).getName())
-        self.assertEqual("C", self.board.gettoken(3, 3).getName())
-        self.assertEqual("D", self.board.gettoken(1, 4).getName())
+        self.assertEqual("A", self.board.gettoken(1, 1).getname())
+        self.assertEqual("B", self.board.gettoken(0, 0).getname())
+        self.assertEqual("C", self.board.gettoken(3, 3).getname())
+        self.assertEqual("D", self.board.gettoken(1, 4).getname())
 
     def test_move(self):
         self.board.move(1, 1, 3, 0)
-        self.assertEqual("A", self.board.gettoken(4, 1).getName())
+        self.assertEqual("A", self.board.gettoken(4, 1).getname())
         self.board.move(4, 1, -1, 1)
-        self.assertEqual("A", self.board.gettoken(3, 2).getName())
+        self.assertEqual("A", self.board.gettoken(3, 2).getname())
         self.board.move(3, 2, 7, 1)
-        self.assertEqual("A", self.board.gettoken(2, 3).getName())
+        self.assertEqual("A", self.board.gettoken(2, 3).getname())
 
     def test_movetoken(self):
         self.board.movetoken(0, 0, 5, 2)
-        self.assertEqual("B", self.board.gettoken(5, 2).getName())
+        self.assertEqual("B", self.board.gettoken(5, 2).getname())
         self.board.movetoken(5, 2, 10, 2)
-        self.assertEqual("B", self.board.gettoken(2, 2).getName())
+        self.assertEqual("B", self.board.gettoken(2, 2).getname())
 
     def test_getter(self):
         self.assertEqual(8, self.board.getwidth())
@@ -54,7 +54,7 @@ class TestBoard(unittest.TestCase):
 
     def test_getnibbleview(self):
         nibble = Nibble('X', 30)
-        nibble.setPos(7, 4)
+        nibble.setpos(7, 4)
         boardview = self.board.getnibbleview(nibble, False)
         self.assertEqual("............E.D...B..F..A", boardview)
         boardview = self.board.getnibbleview(nibble, True)

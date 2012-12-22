@@ -35,7 +35,7 @@ class TestEngine(unittest.TestCase):
 
     def test_register(self):
         self.engine.register()
-        self.assertTrue(self.engine._nibblelist[0].getName() == 'a')
+        self.assertTrue(self.engine._nibblelist[0].getname() == 'a')
         self.assertTrue(len(self.engine._nibblelist) == 1)
 
     def test_getnibblebyid(self):
@@ -47,7 +47,7 @@ class TestEngine(unittest.TestCase):
         nibbleid = self.engine.register()
         nibble = self.engine.getnibblebyid(nibbleid)
         self.engine.killnibble(nibbleid)
-        self.assertEquals(nibble.getEnergy(), 0)
+        self.assertEquals(nibble.getenergy(), 0)
 
     def test_gameplay(self):
         # Init engine
@@ -71,34 +71,34 @@ class TestEngine(unittest.TestCase):
         board._width = 5
         board._height = 5
         board.settoken("*", 0, 0)
-        n1.setPos(2, 2)
+        n1.setpos(2, 2)
         board.settoken(n1, 2, 2)
-        n2.setPos(1, 1)
+        n2.setpos(1, 1)
         board.settoken(n2, 1, 1)
-        n3.setPos(3, 4)
+        n3.setpos(3, 4)
         board.settoken(n3, 3, 4)
 
         # First move.
         # nibble a
         self.assertEquals(board.getnibbleview(2, 2),
             "*.....b.....a..........c.")
-        self.engine.execturn(n1.getName(), 6)
-        self.assertFalse(n1.isAlive())
-        self.assertEquals(n2.getEnergy(), 67)
+        self.engine.execturn(n1.getname(), 6)
+        self.assertFalse(n1.isalive())
+        self.assertEquals(n2.getenergy(), 67)
         self.assertEquals(board.getnibbleview(2, 2),
             "*.....b................c.")
 
         #nibble b
-        self.assertTrue(self.engine.execturn(n2.getName(), 6) != -1)
-        #self.assertEquals(n2.getEnergy(), 69)
+        self.assertTrue(self.engine.execturn(n2.getname(), 6) != -1)
+        #self.assertEquals(n2.getenergy(), 69)
         self.assertEquals(board.getnibbleview(2, 2),
             "b......................c.")
-        self.engine.execturn(n3.getName(), 0)
+        self.engine.execturn(n3.getname(), 0)
 
         # Second move.
         #n1 is dead.
-        self.assertEquals(self.engine.execturn(n1.getName(), 12), -1)
-        self.engine.execturn(n2.getName(), 23)
+        self.assertEquals(self.engine.execturn(n1.getname(), 12), -1)
+        self.engine.execturn(n2.getname(), 23)
         #n3 is dead.
         # game ended
         self.assertEquals(self.engine.getgamestatus(), ENDED)
@@ -127,20 +127,20 @@ class TestEngine(unittest.TestCase):
         a = self.engine.getnibblebyid(aid)
         d = self.engine.getnibblebyid(did)
 
-        a.setEnergy(35)
-        d.setEnergy(40)
+        a.setenergy(35)
+        d.setenergy(40)
         self.engine._fight(a, d)
-        self.assertFalse(a.isAlive())
-        self.assertTrue(d.isAlive())
+        self.assertFalse(a.isalive())
+        self.assertTrue(d.isalive())
 
-        a.setEnergy(35)
-        d.setEnergy(35)
+        a.setenergy(35)
+        d.setenergy(35)
         self.engine._fight(a, d)
-        self.assertTrue(a.isAlive())
-        self.assertFalse(d.isAlive())
+        self.assertTrue(a.isalive())
+        self.assertFalse(d.isalive())
 
-        a.setEnergy(35)
-        d.setEnergy(30)
+        a.setenergy(35)
+        d.setenergy(30)
         self.engine._fight(a, d)
-        self.assertTrue(a.isAlive())
-        self.assertFalse(d.isAlive())
+        self.assertTrue(a.isalive())
+        self.assertFalse(d.isalive())

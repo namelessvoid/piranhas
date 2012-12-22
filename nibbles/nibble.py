@@ -12,35 +12,35 @@ class Nibble(object):
         self._xpos = -1
         self._ypos = -1
 
-    def getEnergy(self):
+    def getenergy(self):
         """Returns the nibble's energy"""
         return self._energy
 
-    def setEnergy(self, energy):
+    def setenergy(self, energy):
         """Sets the nibble's energy"""
         self._energy = energy
 
-    def isAlive(self):
+    def isalive(self):
         """Checks, if or if not the nibble's energy is higher then 0"""
         if self._energy > 0:
             return True
         else:
             return False
 
-    def getName(self):
+    def getname(self):
         """Returns the nibble's name, which is needed
             for the board-representation"""
         return self._name
 
-    def getPos(self):
+    def getpos(self):
         """Returns the nibble's current position"""
         return (self._xpos, self._ypos)
 
-    def setPos(self, x, y):
+    def setpos(self, x, y):
         """Sets the nibbles position."""
         self._xpos = x
         self._ypos = y
 
-    energy = property(getEnergy, setEnergy, isAlive,
+    energy = property(getenergy, setenergy, isalive,
                       "I'm the 'energy' property")
-    pos = property(getPos, setPos, "I'm the 'position' property")
+    pos = property(getpos, setpos, "I'm the 'position' property")
