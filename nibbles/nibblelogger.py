@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from nibbles.nibblesignal import NibbleStringSignal
+from nibbles.nibblesignal import NibbleSignal
 
 class NibbleLogger(object):
     def __init__(self, logger="default.default", level=logging.DEBUG):
@@ -10,7 +10,7 @@ class NibbleLogger(object):
         self._formatter = logging.Formatter("%(asctime)s %(levelname)s: %(name)s: %(message)s", "%d.%m.%Y %H:%M:%S")
         self.setFormatter(self._formatter)
         self._logger.addHandler(self)
-        self.logsignal = NibbleStringSignal()
+        self.logsignal = NibbleSignal()
         qthandler = QtHandler(self.logsignal, level)
         qthandler.setFormatter(self._formatter)
         self._logger.addHandler(qthandler)
@@ -66,4 +66,4 @@ class QtHandler(logging.Handler):
                 record -- (logging.record) record file of pythons logging
                           framework"""
         msg = self.format(record)
-        self._logsignal.callstr(msg)
+        self._logsignal.call(msg)
