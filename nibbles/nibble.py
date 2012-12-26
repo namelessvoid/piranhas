@@ -1,7 +1,7 @@
 class Nibble(object):
     """The representation of the player's nibble on the Nibble-server"""
 
-    def __init__(self, name, energy):
+    def __init__(self, name, energy=35, stamina=3):
         """
         The construtor needs the final variables
         -name
@@ -11,6 +11,7 @@ class Nibble(object):
         self._energy = energy
         self._xpos = -1
         self._ypos = -1
+        self._stamina = stamina
 
     def getenergy(self):
         """Returns the nibble's energy"""
@@ -37,10 +38,19 @@ class Nibble(object):
         return (self._xpos, self._ypos)
 
     def setpos(self, x, y):
-        """Sets the nibbles position."""
+        """Sets the nibble's position."""
         self._xpos = x
         self._ypos = y
+
+    def setstamina(self, stamina):
+        """Sets the nibble's stamina."""
+        self._stamina = stamina
+
+    def getstamina(self):
+        """Retursn the nibble's stamina."""
+        return self._stamina
 
     energy = property(getenergy, setenergy, isalive,
                       "I'm the 'energy' property")
     pos = property(getpos, setpos, "I'm the 'position' property")
+    stamina = property(getstamina, setstamina, "I'm the 'stamina' property")
