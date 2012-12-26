@@ -203,7 +203,6 @@ class Engine():
         self._board = Board(boardsize, boardsize)
         # set first round
         self._currentround = 1
-
         # Place nibbles randomly on the board TODO
         for n in self._nibblelist:
             x, y = 0, 0
@@ -217,7 +216,6 @@ class Engine():
             self._logger.debug(("Placed nibble at n.(%s/%s)."
                 + " Content of board: %s") % (n._xpos, n._ypos,
                 self._board.gettoken(n._xpos, n._ypos).getname()))
-
         # Signal changes
         self.updatesignal.call()
         # Set first player
@@ -263,8 +261,20 @@ class Engine():
         # 0.) Interrupt timer
         self._timer.cancel()
 
+        # Nibble regenerates stamina:
+        if nibble.getstamina() < 3:
+            nibble.setstamina(nibble.getstamina() + 1)
+
         # 1.) direction
         deltas = self._calcdirectionoffset(direction)
+        # use up stamina
+        if len(deltas) >= 2 and nibble.getstamina() >= 3:
+            nibble.setstamina(0)
+        # if nibble wants to sprint but has not enough stamina just
+        # doe a single step.
+        elif len(deltas) >= 2:
+            deltas = deltas[0]
+
         for (dx, dy) in deltas:
             self._nibblestep(nibble, dx, dy)
 
