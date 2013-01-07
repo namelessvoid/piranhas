@@ -23,7 +23,7 @@ class ServerGui(QtGui.QMainWindow):
         self.createaboutdialog()
 
         #connect about
-        self.ui.about.activated.connect(self.aboutdialog)
+        self.ui.about.triggered.connect(self.aboutdialog)
 
         #connect to the update pattern
         self._engine.updatesignal.register(self.updategui)
