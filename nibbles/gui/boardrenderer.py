@@ -2,6 +2,8 @@ import sys
 from PyQt4 import QtGui, QtCore
 import string
 
+from nibbles.nibble import Nibble
+
 
 class BoardRenderer(QtGui.QWidget):
     def __init__(self, parent = None):
@@ -23,8 +25,7 @@ class BoardRenderer(QtGui.QWidget):
             self.char_001.height())
 
         #dimensions of a rectangle that's rendered on the board
-        self.rectwidth = 33
-        self.rectheight = 33
+        self.rectdim = 33
 
         self._board = None
 
@@ -34,8 +35,10 @@ class BoardRenderer(QtGui.QWidget):
     def paintEvent(self, event):
         if self._board is None:
             self._renderempty()
-        # TODO
         else:
+            widgetsize = min(self.width(), self.height())
+            print widgetsize
+            self.rectdim = widgetsize / self._board.getheight()
             self._render()
 
     def _render(self):
@@ -45,16 +48,18 @@ class BoardRenderer(QtGui.QWidget):
 
         for y in range(self._board.getheight()):
             for x in range(self._board.getwidth()):
-                if self._board._field[y][x] == '*':
-                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
-                    painter.drawImage(QtCore.QRect((self.rectwidth*x),(self.rectheight*y),30,30), self.food, QtCore.QRect(0, 0,
+                # Draw empty field
+                painter.drawRect((self.rectdim*x),
+                    (self.rectdim*y), self.rectdim - 3, self.rectdim - 3)
+                token = self._board.gettoken(x, y)
+                # Draw food
+                if token == '*':
+                    painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.food, QtCore.QRect(0, 0,
                         self.food.width(),
                         self.food.height()))
-                elif self._board._field[y][x] == '.':
-                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
-                else:
-                    painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
-                    painter.drawImage(QtCore.QRect((self.rectwidth*x),(self.rectheight*y),30,30), self.char_001, QtCore.QRect(0, 0,
+                # Draw nibble
+                elif isinstance(token, Nibble):
+                    painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.char_001, QtCore.QRect(0, 0,
                         self.char_001.width(),
                         self.char_001.height()))
 
@@ -66,8 +71,8 @@ class BoardRenderer(QtGui.QWidget):
 
         #range in rectangles
         for y in range(10):
-            for x in range(16):
-                painter.drawRect((self.rectwidth*x), (self.rectheight*y), 30 ,30)
+            for x in range(10):
+                painter.drawRect((33 * x), (33 * y), 30 ,30)
 
 #        painter.drawImage(self.ziel1, self.char_001, self.quelle)
 #        painter.drawImage(self.ziel2, self.char_001active, self.quelle)
