@@ -37,7 +37,7 @@ class BoardRenderer(QtGui.QWidget):
             self._renderempty()
         else:
             widgetsize = min(self.width(), self.height())
-            print widgetsize
+            #print widgetsize
             self.rectdim = widgetsize / self._board.getheight()
             self._render()
 
