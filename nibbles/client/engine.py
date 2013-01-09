@@ -19,7 +19,7 @@ class Engine(threading.Thread):
         self._currentenergy = None
         self._ai = ai
         self._gamerun = True
-        self._updatemethod = None
+        self._updatemethods = {}
         self._logger = NibbleStreamLogger("client.engine")
 
     def receivecommand(self):
@@ -57,6 +57,10 @@ class Engine(threading.Thread):
         """Stops the gameloop"""
         self._gamerun = False
 
+    def getgamestatus(self):
+        """Returns the current status of the game"""
+        return self._gamerun
+
     def getcurrentboard(self):
         """Returns the actual view of the nibble"""
         return self._currentboard
@@ -65,13 +69,13 @@ class Engine(threading.Thread):
         """Returns the actual view of the nibble"""
         return self._currentenergy
 
-    def registermethod(self, function):
-        """Register a function which will be called in the gameloop"""
-        self._updatemethod = function
+    def registermethods(self, functions):
+        """Register some functions which will be called from engine"""
+        self._updatemethods = functions
 
     def updategui(self):
-        if self._updatemethod != None:
-            self._updatemethod()
+        if self._updatemethods["updategui"]:
+            self._updatemethods["updategui"]()
 
     def handlemessage(self, message):
         """Handles the message from the server"""
@@ -83,7 +87,8 @@ class Engine(threading.Thread):
             self._currentboard = createfromstring(view, 5, 5)
             self.sendcommand( str( self._ai.think(view, energy) )+"@" )
         else:
-            self.stoploop()
+            self._logger.info(" Game Over!")
+            self._updatemethods["gameoverdialog"]()
 
     def run(self):
         """Commandprocessor for the engine:
