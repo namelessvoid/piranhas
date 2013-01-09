@@ -23,7 +23,7 @@ class ServerGui(QtGui.QMainWindow):
         self.createaboutdialog()
 
         #connect about
-        self.ui.about.activated.connect(self.aboutdialog)
+        self.ui.about.triggered.connect(self.aboutdialog)
 
         #connect to the update pattern
         self._engine.updatesignal.register(self.updategui)
@@ -51,24 +51,24 @@ class ServerGui(QtGui.QMainWindow):
         self.loggingsignal.connect(self.ui.logger.logslot)
 
     def updategui(self):
-        self.c = 0
-        if self.c == 0:
-            self.ui.boardrenderer.setboard(self._engine.getboard())
-            self.c += 1
+        # Update nibbletree
+        self.ui.nibbletree.clear()
+        for nibble in self._engine._nibblelist:
+            item = QtGui.QTreeWidgetItem(self.ui.nibbletree)
+            item.setText(0, nibble.getname())
+            item.setText(1, str(nibble.getenergy()))
 
+        self.ui.boardrenderer.setboard(self._engine.getboard())
         self.ui.countdown.update()
         self.ui.boardrenderer.update()
         self.update()
-
 
     def gamestart(self):
         self._engine.setgamestart(datetime.datetime.now())
         self.ui.boardrenderer.setboard(self._engine.getboard())
 
-
     def gamestop(self):
         self._engine._endgame()
-
 
     def createaboutdialog(self):
         self.dialog = QtGui.QMessageBox()
@@ -83,10 +83,8 @@ class ServerGui(QtGui.QMainWindow):
 
         self.dialog.setText(self.dialogtext)
 
-
     def aboutdialog(self):
         self.dialog.show()
-
 
     def updatelcd(self):
         if self._engine.getgamestatus() == RUNNING:

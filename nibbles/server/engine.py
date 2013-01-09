@@ -272,8 +272,8 @@ class Engine():
             nibble.setstamina(0)
         # if nibble wants to sprint but has not enough stamina just
         # doe a single step.
-        elif len(deltas) >= 2:
-            deltas = deltas[0]
+        elif len(deltas) >= 2 and nibble.getstamina() < 3:
+            deltas = (deltas[0],)
 
         for (dx, dy) in deltas:
             self._nibblestep(nibble, dx, dy)
