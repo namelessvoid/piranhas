@@ -9,7 +9,6 @@ from nibbles.board import *
 from nibbles.client.ai import *
 from nibbles.client.network.networkinterface import *
 
-
 class Engine(threading.Thread):
 
     def __init__(self, ni=None, ai=None):
