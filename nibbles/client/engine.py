@@ -4,7 +4,6 @@ import re
 import sys
 import time
 import threading
-from socket import *
 from nibbles.nibblelogger import *
 from nibbles.board import *
 from nibbles.client.ai import *
@@ -54,10 +53,6 @@ class Engine(threading.Thread):
     def printmessage(self, message):
         """prints a message to stdout"""
         sys.stdout.write(message)
-
-    def renderboard(self, view, energy):
-        """Renders the board"""
-        #self._renderer.renderboard(view, energy)
 
     def stoploop(self):
         """Stops the gameloop"""
