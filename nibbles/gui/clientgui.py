@@ -21,7 +21,8 @@ class ClientGui(QtGui.QMainWindow):
         self.loggingsignal.connect(self._ui.logger.logslot)
 
         #register the update method for gui
-        self._engine.registermethod(self.updategui)
+        self._engine.registermethods({ "updategui" : self.updategui,
+                                       "gameoverdialog" : self.gameoverdialogslot })
 
         #startgame_btn gui
         self._ui.startgame.clicked.connect(self.showdialog)
@@ -31,6 +32,7 @@ class ClientGui(QtGui.QMainWindow):
 
         #create input dialog
         self.createinputdialog()
+        self.creategameoverdialog()
 
     def updategui(self):
         self._ui.boardrenderer.setboard(self._engine.getcurrentboard())
@@ -66,6 +68,16 @@ class ClientGui(QtGui.QMainWindow):
         layout.addWidget(but)
         self._dialog.setLayout(layout)
         self._dialog.connect(but, QtCore.SIGNAL("clicked()"), self.gamestart)
+
+    def creategameoverdialog(self):
+        self._msgbox = QtGui.QMessageBox()
+        self._msgbox.setText("The game is over!")
+        self._msgbox.setIcon(QtGui.QMessageBox.Information)
+        self._msgbox.connect(self._msgbox, QtCore.SIGNAL("showgameoverdialog()"),
+            self._msgbox.exec_)
+
+    def gameoverdialogslot(self):
+        self._msgbox.emit(QtCore.SIGNAL("showgameoverdialog()"))
 
     def showdialog(self):
         self._dialog.show()
