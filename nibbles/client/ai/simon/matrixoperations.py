@@ -3,7 +3,7 @@
 # Following functions are special purpose helper functions.
 # Very specific implementations!
 
-from random import randrange, choice, random
+from random import randrange, random
 
 
 def matrixintersection(src, dest, destpos):
@@ -65,8 +65,7 @@ def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
             if random() <= mutationchance:
                 mutation = randrange(mutationrange[0] * 10,
                             mutationrange[1] * 10) / 10.0
-                print mutation
-                dest[x][y] += mutation + dest[x][y]
+                dest[x][y] = mutation + dest[x][y]
             #dest[x][y] = round(dest[x][y], 2)
 
 
