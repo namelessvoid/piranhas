@@ -50,32 +50,37 @@ def tuplesum(t1, t2):
     return result
 
 
-def mutatematrix(dest, mutationchance=1.0):
+def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
     """This function "mutates" a given 2d-list by adding random
         numbers between -1 and 1 to each element.
         Arguments:
             dest -- (iterable) A 5x5 list that only contains numbers.
             mutationchance -- (float) Specifies the chance with which
-                              one element of the matrix mutates."""
+                              one element of the matrix mutates.
+            mutationrange -- (tuple(lr, hr)) Tuple which contains lower and
+                             upper boundaries of the mutation."""
     for x in range(0, 5):
         for y in range(0, 5):
             mutation = 0
             if random() <= mutationchance:
-                mutation = randrange(-10, 10, 1) / 10.0
-            dest[x][y] += mutation
+                mutation = randrange(mutationrange[0] * 10,
+                            mutationrange[1] * 10) / 10.0
+                print mutation
+                dest[x][y] += mutation + dest[x][y]
+            #dest[x][y] = round(dest[x][y], 2)
 
 
-def recombinematrices(m1, m2):
-    """Takes two matrices and recombines them by randomly choosing one element
-        out of both and setting it as element of a resulting matrix.
-        Arguments:
-            m1, m2 -- (iterable) A 5x5 list that only contains numbers.
-        Return:
-            The resulting matrix."""
-    result = list()
-    for x in range(0, 5):
-        result.append([])
-        for y in range(0, 5):
-            result[x].append(choice((m1[x][y], m2[x][y])))
-    return result
+#def recombinematrices(m1, m2):
+    #"""Takes two matrices and recombines them by randomly choosing one element
+        #out of both and setting it as element of a resulting matrix.
+        #Arguments:
+            #m1, m2 -- (iterable) A 5x5 list that only contains numbers.
+        #Return:
+            #The resulting matrix."""
+    #result = list()
+    #for x in range(0, 5):
+        #result.append([])
+        #for y in range(0, 5):
+            #result[x].append(choice((m1[x][y], m2[x][y])))
+    #return result
 

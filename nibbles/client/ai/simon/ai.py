@@ -38,6 +38,7 @@ class AI():
 
         self.currentview = None
         self.currentmind = None
+        self.energy = 0
 
     def think(self, view, energy):
         """This method takes the current view of the nibble and it's energy
@@ -47,6 +48,7 @@ class AI():
                 energy -- (integer) The current energy of the nibble.
             Return:
                 Integer between 0 and 24."""
+        self.energy = energy
 
         # Convert the view to a board instance.
         self.currentview = createfromstring(view, 5, 5)
