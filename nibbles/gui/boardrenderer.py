@@ -12,7 +12,15 @@ class BoardRenderer(QtGui.QWidget):
         self.pen.setWidth(3)
         self.brush = QtGui.QBrush(QtGui.QColor(255,255,255,20))
 
-        self.char_001 = QtGui.QImage("./nibbles/gui/img/char_001.png")
+        self._img_dict = {"a" : QtGui.QImage("./nibbles/gui/img/char_a.png"),
+                        "b" : QtGui.QImage("./nibbles/gui/img/char_b.png"),
+                        "c" : QtGui.QImage("./nibbles/gui/img/char_c.png"),
+                        "d" : QtGui.QImage("./nibbles/gui/img/char_d.png"),
+                        "e" : QtGui.QImage("./nibbles/gui/img/char_e.png"),
+                        "f" : QtGui.QImage("./nibbles/gui/img/char_f.png"),
+                        }
+
+        self._default_img = QtGui.QImage("./nibbles/gui/img/char_001.png")
         self.char_001active = QtGui.QImage("./nibbles/gui/img/char_001active.png")
         self.food = QtGui.QImage("./nibbles/gui/img/food.png")
 
@@ -21,8 +29,8 @@ class BoardRenderer(QtGui.QWidget):
         self.ziel3 = QtCore.QRect(297, 165, 30, 30)
 
         self.quelle = QtCore.QRect(0, 0,
-            self.char_001.width(),
-            self.char_001.height())
+            self._default_img.width(),
+            self._default_img.height())
 
         #dimensions of a rectangle that's rendered on the board
         self.rectdim = 33
@@ -57,11 +65,19 @@ class BoardRenderer(QtGui.QWidget):
                     painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.food, QtCore.QRect(0, 0,
                         self.food.width(),
                         self.food.height()))
-                # Draw nibble
+                # Draw individual nibble
                 elif isinstance(token, Nibble):
-                    painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.char_001, QtCore.QRect(0, 0,
-                        self.char_001.width(),
-                        self.char_001.height()))
+                    self.nibbleid = token._name
+
+                    if str(self.nibbleid) in self._img_dict:
+                        painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self._img_dict[str(self.nibbleid)], QtCore.QRect(0, 0,
+                            self._default_img.width(),
+                            self._default_img.height()))
+                    else:
+                        painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.default_img, QtCore.QRect(0, 0,
+                            self._default_img.width(),
+                            self._default_img.height()))
+
 
 
     def _renderempty(self):
