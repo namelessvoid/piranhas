@@ -20,11 +20,12 @@ class KNN(object):
             a1.neuron = self.eingabeNeuronen[i]
             self.ausgabeNeuronen[i].axone.append(a1)
 
-    def think(self, eingabewerte, energy):
-
+    def think(self, env, energy):
+        eingabewerte = []
         for x in range(0, 5):
             for y in range(0, 5):
-                self.eingabewerte[x*5+y] = self.values.get(eingabewerte[x*5+y])
+                eingabewerte.append(self.values.get(env[x*5+y]))
+        eingabewerte[12] = 0.5
 
         for i in range(len(eingabewerte)):
             self.eingabeNeuronen[i].wert = eingabewerte[i]
@@ -71,20 +72,13 @@ def trainiere(knn, trainingsdatensatz, lernrate=0.1):
                 axon.gewicht += lernrate*differenz*axon.neuron.wert
 
 if __name__ == '__main__':
-    # Neuronales Netz konstruieren
+
     knn = KNN()
-    # Zwei Sensoren
-    knn.eingabeNeuronen.append(Neuron())
-    knn.eingabeNeuronen.append(Neuron())
-    # Ausgabeneuron
-    knn.ausgabeNeuronen.append(Neuron())
-    # Verbindungen
-    a1 = Axon()
-    a1.neuron = knn.eingabeNeuronen[0]
-    knn.ausgabeNeuronen[0].axone.append(a1)
-    a2 = Axon()
-    a2.neuron = knn.eingabeNeuronen[1]
-    knn.ausgabeNeuronen[0].axone.append(a2)
+
+    boardtestview2 = ">......<....a.....=....>*"
+    energy = "30"
+    print knn.think(boardtestview2, energy)
+
 
     """
     # Logisches Oder
@@ -94,7 +88,7 @@ if __name__ == '__main__':
         (1.0, 0.0, 1.0),
         (1.0, 1.0, 1.0),
     ]
-    """
+
 
     # Logisches Und
     trainingsdatensatz = [
@@ -103,6 +97,8 @@ if __name__ == '__main__':
         ([1.0, 0.0], [0.0]),
         ([1.0, 1.0], [1.0]),
         ]
+
+
 
     print "Vor dem Training:"
     for eingabewerte, ausgabewerte in trainingsdatensatz:
@@ -117,3 +113,5 @@ if __name__ == '__main__':
     for eingabewerte, ausgabewerte in trainingsdatensatz:
         knn.think(eingabewerte, "30")
         print round(knn.ausgabeNeuronen[0].wert), ausgabewerte[0]
+
+    """
