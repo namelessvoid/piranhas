@@ -4,17 +4,21 @@ from random import random, choice, Random
 import datetime
 import threading
 import time
-from pprint import pformat
+import re
 
-from nibbles.client.ai.simon.serverengine import *
-from nibbles.client.ai.simon.ai import AI
-from nibbles.client.ai.simon.matrixoperations import *
-#from nibbles.nibblelogger import NibbleStreamLogger
-
+from nibbles.client.aiimps.simon.serverengine import *
+from nibbles.client.aiimps.simon.ai import AI
+from nibbles.client.aiimps.simon.matrixoperations import *
 
 class DarwinDevice(threading.Thread):
     """Class that controls world population, evolution and the engine."""
     def __init__(self):
+        """Creates a new darwin device. If filename is set, create first
+            population from the content of the given file.
+            Arguments:
+                filename -- (string) name of the file from which nibbles
+                            are loaded. The file has to be in the given
+                            format (see simon.ai.AI.genometostring())."""
         threading.Thread.__init__(self)
         self.enginerunning = threading.Condition()
         self.lock = threading.RLock()
@@ -22,16 +26,16 @@ class DarwinDevice(threading.Thread):
 
         # settings of the darwin device
         # The maximum population
-        self.maxpopulation = 51
+        self.maxpopulation = 30
         # The number of nibbles that survive selection process
-        self.minsurvivors = 10
+        self.minsurvivors = 15
         # Variables used by matrixoperations.mutatematrix()
         self.mutationchance = 0.5
-        self.mutationrange = (-1, 1)
+        self.mutationrange = (-10, 10)
         # Number of simulation cycles
-        self.lifecycles = 3
+        self.lifecycles = 100
         # Number of rounds to be computed by engine
-        self.lifecycleduration = 100
+        self.lifecycleduration = 1000
         # Settings for the engine.
         self.fieldspernibble = 1
         self.foodpernibble = 1
@@ -46,9 +50,10 @@ class DarwinDevice(threading.Thread):
         self.data = None
 
     def run(self):
+        print "Began training..."
         self.infofile = open(self.infofilename, "w")
         for i in range(0, self.lifecycles):
-            # Set up new engine
+            self.starttime = datetime.datetime.now()
             self.engine = Engine(Random())
             self.engine.setcmp(self)
             self.engine.setfieldspernibble(self.fieldspernibble)
@@ -59,23 +64,25 @@ class DarwinDevice(threading.Thread):
             self.repopulate()
             self.registernibbles()
             # Run the engine
-            #td = datetime.timedelta(0, 3)
             self.engine.setgamestart(datetime.datetime.now())
             time.sleep(0.1)
-
             while self.engine.getgamestatus() == RUNNING:
                 if self.data is not None:
                     self.lock.acquire()
+
                     move = self.nibbleids[self.data[0]].think(
                         self.data[1], self.data[2])
                     self.engine.execturn(self.data[0], move)
+
                     self.lock.release()
             # Lifecycle ended
             self.selectbestnibbles()
             self.savelifecycle(i)
-        # All lifecycles ended
+            print "Lifecycle %d/%d done (%s)." % (i + 1,
+                  self.lifecycles, datetime.datetime.now() - self.starttime)
         self.infofile.flush()
         self.infofile.close()
+        print "Training DONE."
 
     def send(self, nibbleid, view, energy, end=False):
         """Implementation of interface to engine. It receives data
@@ -97,9 +104,7 @@ class DarwinDevice(threading.Thread):
         energydict = {}
         k = energydict.keys()
         # Arrange nibbles by their energy.
-        print "nibble energies"
         for n in self.population:
-            print n.energy
             # If no other nibble with same energy is saved, create new list
             if n.energy not in k:
                 energydict[n.energy] = []
@@ -122,9 +127,6 @@ class DarwinDevice(threading.Thread):
             for nibble in energydict[maxkey]:
                 self.population.append(nibble)
             keys.remove(maxkey)
-        print "selected nibbles:"
-        for n in self.population:
-            print n.energy
 
     def reproduce(self, n1, n2):
         """Takes a mother and father nibble and recombines their genomes.
@@ -139,7 +141,6 @@ class DarwinDevice(threading.Thread):
                 child.genome[k] = n1.genome[k]
             else:
                 child.genome[k] = n2.genome[k]
-            self.mutatenibble(child)
         return child
 
     def repopulate(self):
@@ -155,7 +156,9 @@ class DarwinDevice(threading.Thread):
             while len(self.population) < self.maxpopulation:
                 n1 = choice(self.population)
                 n2 = choice(self.population)
-                self.population.append(self.reproduce(n1, n2))
+                nibble = self.reproduce(n1, n2)
+                self.mutatenibble(nibble)
+                self.population.append(nibble)
 
     def registernibbles(self):
         """This function registers all nibbles of population to the engine."""
@@ -168,8 +171,8 @@ class DarwinDevice(threading.Thread):
         """Saves information about the lifecycle to a file.
             Arguments:
                 number -- (int) The number of last lifecycle."""
-        self.infofile.write("Information after lifecycle %s:\n" % number)
+        self.infofile.write("Information after lifecycle %s:\n" % (number + 1))
         for n in self.population:
-            self.infofile.writelines("   AI with %s HP:" % n.energy)
-            text = pformat(n.genome, indent=5)
-            self.infofile.writelines(text + "\n\n")
+            self.infofile.writelines("   AI with %s HP:\n" % n.energy)
+            text = n.genometostring()
+            self.infofile.writelines(text + "\n")

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 *-*
-
-from nibbles.client.ai.simon.darwindevice import DarwinDevice
+from nibbles.client.aiimps.simon.darwindevice import DarwinDevice
 
 dd = DarwinDevice()
 dd.run()

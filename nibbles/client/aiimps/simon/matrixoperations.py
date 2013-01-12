@@ -18,7 +18,7 @@ def matrixintersection(src, dest, destpos):
 
     # calculate the offset of src relative to the center of dest.
 #    print "destpos: %d/%d" % (destpos[0], destpos[1])
-    offset = tuplesum((-2, -2), destpos)
+    offset = (destpos[0] - 2, destpos[1] - 2)
 #    print "offset: %d/%d" % (offset[0], offset[1])
     # x and y are the coordinates on src.
     for x in range(0, 5):
@@ -26,7 +26,7 @@ def matrixintersection(src, dest, destpos):
 #            print "beeing at %d/%d" % (x, y)
             srcval = src[x][y]
 #            print "srcvalue: %d" % srcval
-            (destx, desty) = tuplesum((x, y), offset)
+            (destx, desty) = (x + offset[0], y + offset[1])
 #            print "destcoord: %d/%d" % (destx, desty)
             if(0 <= destx <= 4 and 0 <= desty <= 4):
                 destval = dest[destx][desty]
@@ -35,20 +35,14 @@ def matrixintersection(src, dest, destpos):
 #                print "new destval: %d" % (dest[destx][desty])
 
 
-def tuplesum(t1, t2):
-    """This function takes two touples of numbers and adds
-        the according elements of both:
-        t1 + t2
-        Arguments:
-            t1, t2 -- (iterable) Have to be of the same length and
-                      must contain numbers only!
-        Return:
-            Touple which contains the result."""
-    result = list()
-    for i in range(0, len(t1)):
-        result.append(t1[i] + t2[i])
-    return result
-
+#def tuplesum(t1, t2):
+    #"""Summates two tuples: (x, y) + (a, b) = (x+a, y+b)
+        #Arguments:
+            #t1, t2 -- (tuple) Should be tuples of length 2 and contain
+                      #only numbers.
+        #Return:
+            #Touple which contains the result."""
+    #return (t1[0] + t2[0], t1[1] + t2[1])
 
 def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
     """This function "mutates" a given 2d-list by adding random
@@ -59,13 +53,36 @@ def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
                               one element of the matrix mutates.
             mutationrange -- (tuple(lr, hr)) Tuple which contains lower and
                              upper boundaries of the mutation."""
-    for x in range(0, 5):
-        for y in range(0, 5):
+    for x in xrange(0, 2):
+        for y in xrange(0, 2):
             mutation = 0
             if random() <= mutationchance:
-                mutation = randrange(mutationrange[0] * 10,
-                            mutationrange[1] * 10) / 10.0
-                dest[x][y] = mutation + dest[x][y]
+                mutation = randrange(mutationrange[0], mutationrange[1])
+                dest[x][y] += mutation
+                dest[-x-1][y] += mutation
+                dest[x][-y-1] += mutation
+                dest[-x-1][-y-1] += mutation
+
+    # Hardcoded mutation for the middle lines to avoid redundancy.
+    if random() <= mutationchance:
+        mutation = randrange(mutationrange[0], mutationrange[1])
+        dest[0][2] += mutation
+        dest[2][0] += mutation
+        dest[2][4] += mutation
+        dest[4][2] += mutation
+
+    if random() <= mutationchance:
+        mutation = randrange(mutationrange[0], mutationrange[1])
+        dest[2][1] += mutation
+        dest[1][2] += mutation
+        dest[2][3] += mutation
+        dest[3][2] += mutation
+
+    if random() <= mutationchance:
+        mutation = randrange(mutationrange[0], mutationrange[1])
+        dest[2][2] += mutation
+
+   # matrixintersection(mutationmatrix, dest, (2, 2))
             #dest[x][y] = round(dest[x][y], 2)
 
 
