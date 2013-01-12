@@ -4,7 +4,7 @@ import threading
 import datetime
 from nibbles.circularlist import *
 from nibbles.nibble import *
-from nibbles.board import *
+from nibbles.client.aiimps.simon.boardcopy import *
 from nibbles.server.serverexceptions import *
 
 
@@ -343,7 +343,7 @@ class Engine():
         """Place food on the baord randomly. The amount of food dropped is
             the number of nibbles * self._foodpernibble. If food drops on a
             nibble the lucky one can eat at once."""
-        for i in range(self._foodpernibble * len(self._nibblelist)):
+        for i in xrange(self._foodpernibble * len(self._nibblelist)):
             rx = self._random.randint(0, self._board._width - 1)
             ry = self._random.randint(0, self._board._height - 1)
             # if a nibble is on the chosen location, feed it
