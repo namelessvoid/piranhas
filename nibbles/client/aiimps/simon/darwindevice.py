@@ -4,7 +4,6 @@ from random import random, choice, Random
 import datetime
 import threading
 import time
-import re
 
 from nibbles.client.aiimps.simon.serverengine import *
 from nibbles.client.aiimps.simon.ai import AI
@@ -26,14 +25,14 @@ class DarwinDevice(threading.Thread):
 
         # settings of the darwin device
         # The maximum population
-        self.maxpopulation = 30
+        self.maxpopulation = 51
         # The number of nibbles that survive selection process
         self.minsurvivors = 15
         # Variables used by matrixoperations.mutatematrix()
         self.mutationchance = 0.5
-        self.mutationrange = (-10, 10)
+        self.mutationrange = (-10, 11)
         # Number of simulation cycles
-        self.lifecycles = 100
+        self.lifecycles = 1000
         # Number of rounds to be computed by engine
         self.lifecycleduration = 1000
         # Settings for the engine.
@@ -66,6 +65,7 @@ class DarwinDevice(threading.Thread):
             # Run the engine
             self.engine.setgamestart(datetime.datetime.now())
             time.sleep(0.1)
+            print "Executing lifecycle %d/%d" % (i + 1, self.lifecycles)
             while self.engine.getgamestatus() == RUNNING:
                 if self.data is not None:
                     self.lock.acquire()
@@ -97,36 +97,64 @@ class DarwinDevice(threading.Thread):
             Arguments:
                 nibble -- (simon.ai) Instance of a nibble ai."""
         for k in nibble.genome.keys():
+            #print "mutate nibble %s" % nibble.tempid
             mutatematrix(nibble.genome[k], self.mutationchance,
                 self.mutationrange)
 
     def selectbestnibbles(self):
-        energydict = {}
-        k = energydict.keys()
-        # Arrange nibbles by their energy.
+        # New version
+        # Get list that contains all energys > 0 but at most minimum number
+        # of survivors to be saved.
+        energylist = []
         for n in self.population:
-            # If no other nibble with same energy is saved, create new list
-            if n.energy not in k:
-                energydict[n.energy] = []
-                k = energydict.keys()
-            # Append nibble to the list with same energy.
-            energydict[n.energy].append(n)
+            if n.energy > 0:
+                energylist.append(n.energy)
 
-        # Now take the nibbles with the best energy until
-        # population is restored.
+        energylist = sorted(energylist)[0:self.minsurvivors]
+
+        # Save current population and reset dw.population
+        survivors = self.population
         self.population = []
-        keys = energydict.keys()
-        # Remove zero energy.
-        if 0 in keys:
-            keys.remove(0)
+        # Save back every nibble ai to population which's energy is saved
+        for n in survivors:
+            if n.energy in energylist:
+                self.population.append(n)
+                #print "selected nibble with tempid '%s'and %dHP" % (n.tempid, n.energy)
+                #print n.genome["KI"]
+        #print "Number of selected nibbles: %d" % len(self.population)
 
-        # Take the best nibbles and save them back to the population.
-        while (len(self.population) < self.minsurvivors
-              and len(keys) > 0):
-            maxkey = max(keys)
-            for nibble in energydict[maxkey]:
-                self.population.append(nibble)
-            keys.remove(maxkey)
+        # Old version
+        #energydict = {}
+        #k = energydict.keys()
+        #counter = 0
+        ## Arrange nibbles by their energy.
+        #for n in self.population:
+            ## If no other nibble with same energy is saved, create new list
+            #if n.energy not in k:
+                #energydict[n.energy] = []
+                #k = energydict.keys()
+            ## Append nibble to the list with same energy.
+            #energydict[n.energy].append(n)
+            #if n.energy > 0:
+                #counter += 1
+        #print "Lifecycle survivors: %d" % counter
+
+        ## Now take the nibbles with the best energy until
+        ## population is restored.
+        #self.population = []
+        #keys = energydict.keys()
+        ## Remove zero energy.
+        #if 0 in keys:
+            #keys.remove(0)
+
+        ## Take the best nibbles and save them back to the population.
+        #while (len(self.population) < self.minsurvivors
+              #and len(keys) > 0):
+            #maxkey = max(keys)
+            #for nibble in energydict[maxkey]:
+                #self.population.append(nibble)
+            #keys.remove(maxkey)
+        #print "Number of selected nibbles: %d" % len(self.population)
 
     def reproduce(self, n1, n2):
         """Takes a mother and father nibble and recombines their genomes.
@@ -135,36 +163,51 @@ class DarwinDevice(threading.Thread):
             Return:
                 simon.ai instance which is the children of n1 and n2."""
         child = AI()
-        for k in child.genome.keys():
-            # Either take genome of mother or father
-            if random() < 0.5:
-                child.genome[k] = n1.genome[k]
-            else:
-                child.genome[k] = n2.genome[k]
+        #for k in child.genome.keys():
+            ## Either take genome of mother or father
+            #if random() < 0.5:
+                #child.genome[k] = n1.genome[k]
+            #else:
+                #child.genome[k] = n2.genome[k]
+        #print "Reproducing ai %s with ai %s" % (n1.tempid, n2.tempid)
+        child.genome["KI"] = copymatrix(n1.genome["KI"])
+        child.genome["EI"] = copymatrix(n1.genome["EI"])
+        child.genome["FI"] = copymatrix(n2.genome["FI"])
+        child.genome["MR"] = copymatrix(n2.genome["MR"])
+        child.tempid = n1.tempid + n2.tempid
         return child
 
     def repopulate(self):
         """Creates nibbles until the maximum population is reached."""
         # Create population for the first time
         if len(self.population) == 0:
+            #print "First time repopulation"
             while len(self.population) < self.maxpopulation:
                 nibble = AI()
                 self.mutatenibble(nibble)
                 self.population.append(nibble)
         # Repopulate world from existing population.
         else:
+            #print "Repopulisation with reproduction"
+            survivors = self.population
+            self.population = []
             while len(self.population) < self.maxpopulation:
-                n1 = choice(self.population)
-                n2 = choice(self.population)
-                nibble = self.reproduce(n1, n2)
-                self.mutatenibble(nibble)
-                self.population.append(nibble)
+                n1 = choice(survivors)
+                # Prevent n1 from reproducing with itself
+                survivors.remove(n1)
+                n2 = choice(survivors)
+                survivors.append(n1)
+                # Birth of new nibble
+                child = self.reproduce(n1, n2)
+                self.mutatenibble(child)
+                self.population.append(child)
 
     def registernibbles(self):
         """This function registers all nibbles of population to the engine."""
         self.nibbleids = {}
         for n in self.population:
             newid = self.engine.register()
+            n.tempid = newid
             self.nibbleids[newid] = n
 
     def savelifecycle(self, number):
@@ -173,6 +216,7 @@ class DarwinDevice(threading.Thread):
                 number -- (int) The number of last lifecycle."""
         self.infofile.write("Information after lifecycle %s:\n" % (number + 1))
         for n in self.population:
-            self.infofile.writelines("   AI with %s HP:\n" % n.energy)
+            self.infofile.writelines("   AI with %s HP (current id %s):\n"
+                % (n.energy, n.tempid))
             text = n.genometostring()
             self.infofile.writelines(text + "\n")

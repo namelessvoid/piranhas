@@ -63,6 +63,7 @@ class AI():
         self.currentmind = None
         self.energy = 0
         self.stamina = 3
+        self.tempid = None
 
     def think(self, view, energy):
         """This method takes the current view of the nibble and it's energy

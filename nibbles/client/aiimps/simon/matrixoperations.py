@@ -53,6 +53,7 @@ def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
                               one element of the matrix mutates.
             mutationrange -- (tuple(lr, hr)) Tuple which contains lower and
                              upper boundaries of the mutation."""
+    #print "before mutation: %s" % dest
     for x in xrange(0, 2):
         for y in xrange(0, 2):
             mutation = 0
@@ -81,10 +82,26 @@ def mutatematrix(dest, mutationchance=1.0, mutationrange=(-1, 1)):
     if random() <= mutationchance:
         mutation = randrange(mutationrange[0], mutationrange[1])
         dest[2][2] += mutation
+    #print "after mutation: %s" % dest
 
    # matrixintersection(mutationmatrix, dest, (2, 2))
             #dest[x][y] = round(dest[x][y], 2)
 
+
+def copymatrix(m):
+    """Copies a given matrix.
+        Arguments:
+            m -- (iterable) the matrix to copy
+        Returns:
+            newmatrix -- (iterable) copy of m"""
+    newmatrix = []
+    linenumber = 0
+    for line in m:
+        newmatrix.append([])
+        for entry in line:
+            newmatrix[linenumber].append(entry)
+        linenumber += 1
+    return newmatrix
 
 #def recombinematrices(m1, m2):
     #"""Takes two matrices and recombines them by randomly choosing one element
