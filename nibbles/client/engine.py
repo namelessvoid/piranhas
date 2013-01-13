@@ -18,6 +18,8 @@ class Engine(threading.Thread):
         self._currentboard = None
         self._currentenergy = None
         self._ai = ai
+        self.worldsize = None
+        self._paintboard = True
         self._gamerun = True
         self._updatemethods = {}
         self._logger = NibbleStreamLogger("client.engine")
@@ -28,6 +30,9 @@ class Engine(threading.Thread):
 
     def sendcommand(self, command):
         self._ni.sendmessage(command)
+
+    def clearbuffers(self):
+        self._ni.clearbuffers()
 
     def registrationpossible(self):
         """Checks whether registration is possible on server"""
@@ -44,6 +49,10 @@ class Engine(threading.Thread):
     def getworldsize(self):
         """Gets the size of the world"""
         self._ni.sendmessage("weltgroesse@")
+
+    def setworldsize(self, size):
+        """Sets the size of the world"""
+        self.worldsize = size.rstrip("@").split("x")
 
     def startgame(self):
         """Starts the game"""
@@ -79,14 +88,24 @@ class Engine(threading.Thread):
 
     def handlemessage(self, message):
         """Handles the message from the server"""
+
+        if self.worldsize == None:
+            self.getworldsize()
+
         energy = message.split(";")[0]
         view = message.split(";")[1]
-        field = message.split(";")[2]
+        field = message.split(";")[-1]
         self._currentenergy = energy
         if view != "ende" and int(energy) > 0:
             self._currentboard = createfromstring(view, 5, 5)
             self.sendcommand( str( self._ai.think(view, energy) )+"@" )
         else:
+            self.clearbuffers()
+            if not self.worldsize == None and self._paintboard:
+                field = field.rstrip("@")
+                self._currentboard = createfromstring(field, int(self.worldsize[0]),
+                    int(self.worldsize[1]))
+                self._paintboard = False
             self._logger.info(" Game Over!")
             self._updatemethods["gameoverdialog"]()
 
@@ -98,14 +117,13 @@ class Engine(threading.Thread):
             "ja@" : lambda param: self.register(),
             "nein@" : lambda param: self.printmessage("Anmeldung nicht moeglich"),
             "\D{1}@" : lambda param: self.startgame(),
-            "\d+x\d+@" : lambda param: self.printmessage(param),
+            "\d+x\d+@" : lambda param: self.setworldsize(param),
             "\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}" : lambda param: self.printmessage(param), #do something
             "(;|\d{1,4};)(;|[*><=.\D]{25};|ende;)(@|[*><=.\D]*@)" : lambda param: self.handlemessage(param)
         }
 
         while self._gamerun:
             command = self.receivecommand()
-            time.sleep(0.3)
             if command:
                 self._logger.info(" Client Received command: %s" % command)
 
@@ -119,7 +137,7 @@ class Engine(threading.Thread):
                         break
 
             self.updategui()
-            time.sleep(0.4)
+            time.sleep(0.5)
 
 if __name__== "__main__":
 
