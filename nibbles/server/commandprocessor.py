@@ -60,7 +60,7 @@ class CommandProcessor():
                 if self.engine.getgamestatus() == INIT:
                     self.server.sendTo(clientNumber, 'fehler@')
                 else:
-                    x, y = self.engine.getworlddimentions()
+                    x, y = self.engine.getworlddimensions()
                     self.server.sendTo(clientNumber, '%dx%d@' %(x, y))
 
             elif data == 'spielbeginn@':

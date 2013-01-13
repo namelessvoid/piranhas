@@ -182,6 +182,13 @@ class Engine():
                          in the engine."""
         return self._board
 
+    def getworlddimensions(self):
+        """Get the dimension of the board.
+            Return:
+                tuple -- (int, int) The width and height of the board
+        """
+        return (self._board.getwidth(), self._board.getheight())
+
     def setgamestart(self, date):
         """Sets the time when the game begins and executes the timer which
             calls self.run() when the game begins.
