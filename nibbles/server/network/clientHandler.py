@@ -1,9 +1,9 @@
-import thread
+import threading
 import time
 import logging
 from nibbles.nibblelogger import NibbleStreamLogger
 
-class ClientHandler():
+class ClientHandler(threading.Thread):
     def __init__(self, commandProcessor, socket, clientNumber=0, threadDelay=1):
         """Initialize the ClientHandler.
                 Arguments:
@@ -12,6 +12,7 @@ class ClientHandler():
                     clientNumber -- (integer) individual number of the client
                     threadDelay -- (integer) This is the number of seconds execution to be suspended. """
 
+        threading.Thread.__init__(self)
         self.socket = socket
         self.clientNumber = clientNumber
         self.commandProcessor = commandProcessor
@@ -19,11 +20,8 @@ class ClientHandler():
 
         # create logger
         self._logger = NibbleStreamLogger("server.network.clientHandler.%d" % self.clientNumber, logging.INFO)
-
-        try:
-            self.listenThreadClientHandler = thread.start_new_thread(self.listen, (self.threadDelay,))
-        except thread.error:
-            self._logger.warning('Unable to start listenThreadClientHandler')
+        # execute the thread
+        self.start()
 
     def send(self, messageString):
         """Send messageString to the client.
@@ -32,16 +30,15 @@ class ClientHandler():
         self._logger.info('"' + messageString + '" was sent to client')
         self.socket.sendall(messageString)
 
-    def listen(self, delay):
+    def run(self):
         """Listens on the client.
                 Arguments:
                     delay --  (integer) defined in seconds."""
 
-
         BUF_SIZE = 1024
         self.data = None
         while True:
-            time.sleep(delay)
+            time.sleep(self.threadDelay)
             try:
                 self.data = self.socket.recv(BUF_SIZE)
             except Exception as e:
