@@ -62,23 +62,23 @@ class BoardRenderer(QtGui.QWidget):
                 token = self._board.gettoken(x, y)
                 # Draw food
                 if token == '*':
-                    painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.food, QtCore.QRect(0, 0,
-                        self.food.width(),
-                        self.food.height()))
+                    self._drawimage(x, y, self.food, painter)
                 # Draw individual nibble
                 elif isinstance(token, Nibble):
                     self.nibbleid = token._name
 
                     if str(self.nibbleid) in self._img_dict:
-                        painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self._img_dict[str(self.nibbleid)], QtCore.QRect(0, 0,
-                            self._default_img.width(),
-                            self._default_img.height()))
+                        self._drawimage(x, y, self._img_dict[str(self.nibbleid)], painter)
                     else:
-                        painter.drawImage(QtCore.QRect((self.rectdim*x),(self.rectdim*y),self.rectdim - 3,self.rectdim - 3), self.default_img, QtCore.QRect(0, 0,
-                            self._default_img.width(),
-                            self._default_img.height()))
+                        self._drawimage(x, y, self._default_img, painter)
 
+                elif token in string.ascii_lowercase+"<>=":
+                    self._drawimage(x, y, self._default_img, painter)
 
+    def _drawimage(self, x, y, img, painter):
+        painter.drawImage(QtCore.QRect(
+            self.rectdim*x, self.rectdim*y, self.rectdim - 3, self.rectdim - 3
+        ), img, QtCore.QRect(0, 0, img.width(), img.height()))
 
     def _renderempty(self):
         painter = QtGui.QPainter(self)
