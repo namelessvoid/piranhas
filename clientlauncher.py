@@ -1,7 +1,8 @@
 from PyQt4 import QtGui, QtCore
 import sys
 from nibbles.client.engine import *
-from nibbles.client.ai import *
+#from nibbles.client.ai import *
+from nibbles.client.aiimps.simon.ai import AI
 from nibbles.client.network.networkinterface import *
 from nibbles.gui.clientgui import ClientGui
 

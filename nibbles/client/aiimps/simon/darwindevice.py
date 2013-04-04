@@ -6,7 +6,7 @@ import threading
 import time
 
 from nibbles.client.aiimps.simon.serverengine import *
-from nibbles.client.aiimps.simon.ai import AI
+from nibbles.client.aiimps.simon.ai import TrainingsAI as AI
 from nibbles.client.aiimps.simon.matrixoperations import *
 
 class DarwinDevice(threading.Thread):
@@ -25,19 +25,19 @@ class DarwinDevice(threading.Thread):
 
         # settings of the darwin device
         # The maximum population
-        self.maxpopulation = 51
+        self.maxpopulation = 10
         # The number of nibbles that survive selection process
-        self.minsurvivors = 15
+        self.minsurvivors = 2
         # Variables used by matrixoperations.mutatematrix()
-        self.mutationchance = 0.5
+        self.mutationchance = 1
         self.mutationrange = (-10, 11)
         # Number of simulation cycles
-        self.lifecycles = 1000
+        self.lifecycles = 100
         # Number of rounds to be computed by engine
-        self.lifecycleduration = 1000
+        self.lifecycleduration = 10
         # Settings for the engine.
-        self.fieldspernibble = 1
-        self.foodpernibble = 1
+        self.fieldspernibble = 3
+        self.foodpernibble = 3
         self.turntimeout = 10
         # List that holds all nibbles
         self.population = []
