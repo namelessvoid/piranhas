@@ -11,4 +11,4 @@ Concept
 Piranhas live in a rectangular sea which is devided into equal-sized squares. Each piranha can use a different AI implementation to think about his moves. To survive he has to find food (feet of careless swimmers or other piranhas)
 otherwise he would starve to death.
 
-Piranhas has a client-server architecture which allows different clients driven by different AIs to compete on one server.
+Piranhas has a client-server architecture which allows different clients driven by different AI-bots to compete on one server.
